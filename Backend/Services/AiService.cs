@@ -18,6 +18,10 @@ namespace Backend.Services
         private readonly AiSettings _settings;
         private readonly ILogger<AiService> _logger;
 
+        private static bool _ollamaAvailable = false;
+        private static DateTime _lastOllamaPingUtc = DateTime.MinValue;
+        private static readonly TimeSpan OllamaCheckInterval = TimeSpan.FromSeconds(30);
+
         public AiService(HttpClient httpClient, IOptions<AiSettings> settings, ILogger<AiService> logger)
         {
             _httpClient = httpClient;
@@ -26,21 +30,39 @@ namespace Backend.Services
             _httpClient.Timeout = TimeSpan.FromSeconds(25);
         }
 
+        private async Task<bool> IsOllamaAliveAsync()
+        {
+            if (DateTime.UtcNow - _lastOllamaPingUtc < OllamaCheckInterval)
+            {
+                return _ollamaAvailable;
+            }
+
+            try
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
+                var res = await _httpClient.GetAsync($"{_settings.OllamaEndpoint}/api/tags", cts.Token);
+                _ollamaAvailable = res.IsSuccessStatusCode;
+            }
+            catch
+            {
+                _ollamaAvailable = false;
+            }
+            finally
+            {
+                _lastOllamaPingUtc = DateTime.UtcNow;
+            }
+
+            return _ollamaAvailable;
+        }
+
         public string GetActiveProviderName() => _settings.Provider;
 
         public async Task<List<AiProviderInfo>> GetAvailableProvidersAsync()
         {
             var list = new List<AiProviderInfo>();
 
-            // 1. Ollama Local Health Check
-            bool ollamaAvailable = false;
-            try
-            {
-                using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1500));
-                var res = await _httpClient.GetAsync($"{_settings.OllamaEndpoint}/api/tags", cts.Token);
-                ollamaAvailable = res.IsSuccessStatusCode;
-            }
-            catch { /* offline */ }
+            // 1. Ollama Local Health Check (Fast cached ping)
+            bool ollamaAvailable = await IsOllamaAliveAsync();
 
             list.Add(new AiProviderInfo(
                 "Ollama (Local Desktop)",
@@ -165,9 +187,15 @@ namespace Backend.Services
 
         private async Task<AiCompletionResult?> TryOllamaAsync(string userMessage, string systemPrompt, List<ChatMessage>? history)
         {
+            // Fast pre-flight check: if Ollama is not installed or offline, bypass immediately in 0ms!
+            if (!await IsOllamaAliveAsync())
+            {
+                return null;
+            }
+
             try
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
                 var payload = new
                 {
                     model = _settings.OllamaModel,
@@ -176,6 +204,8 @@ namespace Backend.Services
                 };
 
                 var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+                // 1. Try standard OpenAI-compatible Ollama endpoint
                 var res = await _httpClient.PostAsync($"{_settings.OllamaEndpoint}/v1/chat/completions", content, cts.Token);
 
                 if (res.IsSuccessStatusCode)
@@ -193,10 +223,37 @@ namespace Backend.Services
                         return new AiCompletionResult(text.Trim(), "Ollama", _settings.OllamaModel, false);
                     }
                 }
+                else if (res.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    // 2. Fallback to Ollama native /api/chat endpoint if /v1/chat/completions returned 404
+                    var nativePayload = new
+                    {
+                        model = _settings.OllamaModel,
+                        messages = BuildOpenAiMessages(systemPrompt, userMessage, history),
+                        stream = false
+                    };
+                    var nativeContent = new StringContent(JsonSerializer.Serialize(nativePayload), Encoding.UTF8, "application/json");
+                    var nativeRes = await _httpClient.PostAsync($"{_settings.OllamaEndpoint}/api/chat", nativeContent, cts.Token);
+                    if (nativeRes.IsSuccessStatusCode)
+                    {
+                        var nJson = await nativeRes.Content.ReadAsStringAsync();
+                        using var nDoc = JsonDocument.Parse(nJson);
+                        var nText = nDoc.RootElement
+                            .GetProperty("message")
+                            .GetProperty("content")
+                            .GetString();
+
+                        if (!string.IsNullOrWhiteSpace(nText))
+                        {
+                            return new AiCompletionResult(nText.Trim(), "Ollama", _settings.OllamaModel, false);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogDebug("Ollama not reachable: {Message}", ex.Message);
+                _ollamaAvailable = false;
             }
             return null;
         }

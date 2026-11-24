@@ -28,9 +28,15 @@ namespace Backend.Seed
 
             try
             {
-                // Ensure database tables are created and pending migrations applied
-                try { await context.Database.MigrateAsync(); } catch {}
-                await context.Database.EnsureCreatedAsync();
+                // Ensure database tables are created cleanly without migration conflicts
+                if (context.Database.IsSqlite())
+                {
+                    await context.Database.EnsureCreatedAsync();
+                }
+                else
+                {
+                    try { await context.Database.MigrateAsync(); } catch { await context.Database.EnsureCreatedAsync(); }
+                }
 
                 await SeedAdminUserAsync(context, logger);
                 await SeedSiteSettingsAsync(context, logger);
@@ -55,48 +61,39 @@ namespace Backend.Seed
         {
             try
             {
-                // Ensure Menus table exists
-                const string createMenusTableSql = @"
-                    CREATE TABLE IF NOT EXISTS ""Menus"" (
-                        ""Id"" TEXT NOT NULL CONSTRAINT ""PK_Menus"" PRIMARY KEY,
-                        ""Name"" TEXT NOT NULL,
-                        ""Slug"" TEXT NOT NULL,
-                        ""Location"" TEXT NULL,
-                        ""IsPrimary"" INTEGER NOT NULL DEFAULT 1,
-                        ""IsDeleted"" INTEGER NOT NULL DEFAULT 0,
-                        ""CreatedAt"" TEXT NOT NULL,
-                        ""CreatedBy"" TEXT NULL,
-                        ""UpdatedAt"" TEXT NULL,
-                        ""UpdatedBy"" TEXT NULL,
-                        ""DeletedAt"" TEXT NULL,
-                        ""DeletedBy"" TEXT NULL
-                    );";
-                try { await context.Database.ExecuteSqlRawAsync(createMenusTableSql); } catch { }
+                // Verify column existence before attempting any ALTER TABLE to avoid duplicate column errors
+                if (context.Database.IsSqlite())
+                {
+                    var existingCols = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    try
+                    {
+                        var conn = context.Database.GetDbConnection();
+                        if (conn.State != System.Data.ConnectionState.Open)
+                        {
+                            await context.Database.OpenConnectionAsync();
+                        }
+                        using var cmd = conn.CreateCommand();
+                        cmd.CommandText = "PRAGMA table_info(\"MenuItems\");";
+                        using var reader = await cmd.ExecuteReaderAsync();
+                        while (await reader.ReadAsync())
+                        {
+                            existingCols.Add(reader.GetString(1));
+                        }
+                    }
+                    catch { }
 
-                // Ensure MenuItems table exists
-                const string createMenuItemsTableSql = @"
-                    CREATE TABLE IF NOT EXISTS ""MenuItems"" (
-                        ""Id"" TEXT NOT NULL CONSTRAINT ""PK_MenuItems"" PRIMARY KEY,
-                        ""MenuId"" TEXT NULL,
-                        ""Title"" TEXT NOT NULL,
-                        ""Url"" TEXT NOT NULL,
-                        ""Order"" INTEGER NOT NULL,
-                        ""IsVisible"" INTEGER NOT NULL DEFAULT 1,
-                        ""IsExternal"" INTEGER NOT NULL DEFAULT 0,
-                        ""ParentId"" TEXT NULL,
-                        ""IsDeleted"" INTEGER NOT NULL DEFAULT 0,
-                        ""CreatedAt"" TEXT NOT NULL,
-                        ""CreatedBy"" TEXT NULL,
-                        ""UpdatedAt"" TEXT NULL,
-                        ""UpdatedBy"" TEXT NULL,
-                        ""DeletedAt"" TEXT NULL,
-                        ""DeletedBy"" TEXT NULL
-                    );";
-                try { await context.Database.ExecuteSqlRawAsync(createMenuItemsTableSql); } catch { }
-
-                // Add missing columns to existing tables
-                try { await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""MenuItems"" ADD COLUMN ""ParentId"" TEXT NULL;"); } catch { }
-                try { await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""MenuItems"" ADD COLUMN ""MenuId"" TEXT NULL;"); } catch { }
+                    if (existingCols.Count > 0)
+                    {
+                        if (!existingCols.Contains("ParentId"))
+                        {
+                            try { await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""MenuItems"" ADD COLUMN ""ParentId"" TEXT NULL;"); } catch { }
+                        }
+                        if (!existingCols.Contains("MenuId"))
+                        {
+                            try { await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""MenuItems"" ADD COLUMN ""MenuId"" TEXT NULL;"); } catch { }
+                        }
+                    }
+                }
 
                 // Ensure primary default menu exists
                 if (!await context.Menus.IgnoreQueryFilters().AnyAsync())
