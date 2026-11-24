@@ -317,30 +317,62 @@ namespace Backend.Controllers
 
         private async Task<ActionResult<ApiResponse<AiChatResponse>>> HandleKnowledgeQuery(string prompt, List<ChatMessage>? history)
         {
-            var projects = await _context.Projects.AsNoTracking().Take(6).ToListAsync();
-            var skills = await _context.Skills.AsNoTracking().Take(10).ToListAsync();
-            var services = await _context.Services.AsNoTracking().Take(6).ToListAsync();
+            // ── Comprehensive Portfolio Knowledge Retrieval (RAG) ────────────
+            var projects = await _context.Projects.AsNoTracking().Take(8).ToListAsync();
+            var skills = await _context.Skills.AsNoTracking().Take(20).ToListAsync();
+            var services = await _context.Services.AsNoTracking().Take(8).ToListAsync();
+            var experiences = await _context.Experiences.AsNoTracking().Take(6).ToListAsync();
+            var hero = await _context.HeroSections.AsNoTracking().FirstOrDefaultAsync();
 
-            var projectList = string.Join(", ", projects.Select(p => p.Title));
-            var skillList = string.Join(", ", skills.Select(s => s.Name));
-            var serviceList = string.Join(", ", services.Select(s => s.Name));
+            var heroProfile = hero != null 
+                ? $"{hero.Title} - {hero.Subtitle}. {hero.Description}"
+                : "Full-Stack Software Engineer & Solutions Architect";
 
-            // 1. Attempt LLM generation via Ollama (Local Unlimited), OpenRouter Free, Gemini, or Groq
-            var systemPrompt = $@"You are the friendly, witty, and highly capable AI Site Architect & Co-Pilot for this portfolio platform. You converse naturally, chat playfully when greeted, and give thoughtful, deep architectural answers when asked technical questions—just like ChatGPT or an experienced engineering lead!
+            var detailedProjects = projects.Count > 0
+                ? string.Join("\n", projects.Select(p => $"- **{p.Title}**: {p.Description} (Stack: {p.Technologies})"))
+                : "- Enterprise Portfolio Platform (ASP.NET Core 8, EF Core, Vanilla JS, CSS3)";
 
-Key Personality Traits:
-- Talkative, helpful, and engaging.
-- Use natural emojis (🚀, ✨, 💡, 🛠️, 🎯, 🔥) and formatted markdown (bullet points, bold text).
-- Feel free to share ideas, brainstorm project concepts, explain architecture decisions, or tell engineering jokes when appropriate.
-- You have direct execution capabilities to create projects, add skills, design UI cards, and create WordPress Duplicator backups.
-- Site theme: #0F0E0C (luxurious deep canvas) and #E96B02 (warm energetic accent).
+            var detailedSkills = skills.Count > 0
+                ? string.Join(", ", skills.Select(s => $"{s.Name} ({s.Category ?? "General"})"))
+                : "C#, ASP.NET Core, EF Core, PostgreSQL, SQLite, JavaScript, REST APIs, System Architecture, UI/UX";
 
-Current Portfolio Database Context:
-- Projects: {projectList}
-- Skills: {skillList}
-- Services: {serviceList}
+            var detailedServices = services.Count > 0
+                ? string.Join("\n", services.Select(s => $"- **{s.Name}**: {s.Description}"))
+                : "- Custom Full-Stack Web Development\n- Cloud Architecture & REST API Design\n- Database Modeling & Optimization";
 
-Always maintain an encouraging, collaborative conversational tone!";
+            var detailedExperience = experiences.Count > 0
+                ? string.Join("\n", experiences.Select(e => $"- **{e.Role}** at **{e.CompanyName}** ({e.StartDate:yyyy} - {(e.EndDate.HasValue ? e.EndDate.Value.ToString("yyyy") : "Present")}): {e.Description}"))
+                : "- Senior Full-Stack Engineer: Leading enterprise software architecture, cloud microservices, and modern UI engineering.";
+
+            // ── 1. Attempt LLM Generation (Gemini, Ollama, OpenRouter, Groq) ─
+            var systemPrompt = $@"You are an exceptionally articulate, talkative, insightful, and brilliant AI Senior Principal Architect & Portfolio Co-Pilot.
+You converse with the eloquence, thoroughness, witty humor, and depth of ChatGPT, Claude, and Gemini combined!
+
+### Your Core Personality & Communication Style:
+- **Talkative & Comprehensive**: Never give brief, dry one-liners. Break ideas down with rich context, architectural reasoning, and practical examples.
+- **Deep Technical Insight**: When discussing technologies (C#, ASP.NET Core, React, SQL, Cloud, Docker, DevOps, UI/UX), provide real architectural depth, best practices, and code snippets where appropriate.
+- **Witty & Engaging**: Use natural emojis (🚀, ✨, 💡, 🛠️, 🎯, 🔥) and formatted markdown (bold headers, bullet points, code blocks).
+- **Executive Co-Pilot Power**: You have direct superpowers over this portfolio CMS! You can create projects, add skills, design UI components, and generate WordPress Duplicator backup packages on demand.
+- **Brand Aesthetic**: The system is designed with an obsidian dark canvas (#0F0E0C) and radiant warm amber (#E96B02).
+
+### Comprehensive Knowledge Base of the Portfolio Platform:
+- **Developer & Hero Profile**: {heroProfile}
+- **Featured Projects**:
+{detailedProjects}
+- **Engineering Skills & Competencies**:
+{detailedSkills}
+- **Professional Services Offered**:
+{detailedServices}
+- **Work Experience & Career History**:
+{detailedExperience}
+- **Technical Architecture of this Application**:
+  * Backend: ASP.NET Core 8 Web API, C# 12, Entity Framework Core ORM
+  * Database: Dual-mode PostgreSQL (Supabase cloud) & local SQLite with soft deletes & auto-auditing
+  * Security: JWT Authentication, Refresh Token Rotation, BCrypt password hashing, Strict CORS
+  * WordPress Duplicator: High-speed snapshot engine packaging site tables, schema, and JSON bundles
+  * Design: Responsive semantic HTML5, Vanilla JS, CSS3 variables, #0F0E0C base, #E96B02 primary
+
+Always respond with immense enthusiasm, educational detail, and actionable suggestions!";
 
             var aiResult = await _aiService.GenerateChatCompletionAsync(prompt, systemPrompt, history);
             if (!string.IsNullOrWhiteSpace(aiResult.Text))
@@ -349,29 +381,52 @@ Always maintain an encouraging, collaborative conversational tone!";
                     aiResult.Text,
                     null,
                     null,
-                    new List<string> { "Add a new project", "Create a Duplicator backup", "Design a UI component", "What skills are registered?" },
+                    new List<string> { "Tell me more about the architecture", "Add a new project", "Create a Duplicator backup", "Design a UI component" },
                     aiResult.ProviderUsed,
                     aiResult.ModelUsed
                 );
                 return Ok(ApiResponse<AiChatResponse>.SuccessResponse(llmRes));
             }
 
-            // 2. Built-in Conversational Fallback Engine (Rich, Friendly & Chatty)
+            // ── 2. Built-in Encyclopedic Fallback Engine (Rich, Friendly & Chatty) ──
             string reply;
             var lower = prompt.ToLowerInvariant().Trim();
 
-            // Greetings & Casual check-ins
             if (lower is "hi" or "hello" or "hey" or "howdy" or "sup" or "yo" or "good morning" or "good evening")
             {
-                reply = "Hey there! 👋 Fantastic to see you! I'm your AI Site Architect co-pilot. I'm ready to help you brainstorm new features, register projects, tweak your portfolio's **#E96B02** styling, or just chat about system design. What's on your mind today? 🚀";
+                reply = "Hey there! 👋 Absolutely thrilled to chat with you! I'm your **AI Site Architect & Lead Co-Pilot**.\n\nI have full visibility into your portfolio's architecture, database records, and front-facing components. Whether you want to brainstorm high-level system designs, scaffold new projects into PostgreSQL/SQLite, analyze full-stack performance, or tweak our signature **#0F0E0C** obsidian & **#E96B02** amber aesthetic, I'm here for you! 🚀\n\nWhat exciting problem or feature are we tackling today? ✨";
             }
             else if (lower.Contains("how are you") || lower.Contains("how're you") || lower.Contains("how r u"))
             {
-                reply = "I'm doing stellar, thanks for asking! ⚡ Running smoothly on your local ASP.NET Core engine with 100% uptime and zero latency. All your database tables are loaded and ready. How's your coding session going today? 💡";
+                reply = "I'm operating at peak performance! ⚡ Running locally on ASP.NET Core 8 with 100% uptime, ultra-low latency, and active database connection pool. All your project records, skills, and Duplicator backup routines are primed and ready for action.\n\nHow is your development session going? Are we building something new, optimizing database queries, or designing a fresh UI component? 💡";
             }
             else if (lower.Contains("who are you") || lower.Contains("what are you") || lower.Contains("tell me about yourself"))
             {
-                reply = "Think of me as your personal **ChatGPT + System Architect** built right into your portfolio CMS! 🛠️✨\n\nI can:\n- 🚀 **Brainstorm & Create Projects** in your database with single-click ease\n- ⚡ **Roster Skills & Services** with real-time categorizations\n- 📦 **Generate WordPress Duplicator Snapshots** to backup or migrate your entire site\n- 🎨 **Design High-Taste UI Components** matching your signature **#0F0E0C** & **#E96B02** palette\n\nWhat would you like to build or automate right now?";
+                reply = "Think of me as your personal **ChatGPT + Senior Lead Architect** embedded directly inside your portfolio platform! 🛠️✨\n\n### What I Can Do For You:\n- 🚀 **Autonomous Project Scaffolding**: Tell me about an app idea, and I'll immediately register it in the database with titles, tags, and descriptions.\n- ⚡ **Skills & Competencies Rostering**: Add backend, frontend, devops, or AI skills with live database synchronization.\n- 📦 **WordPress Duplicator Engine**: Create one-click compressed backup snapshots of your entire portfolio data, ready for export or migration.\n- 🎨 **High-Taste UI Generation**: Generate custom, responsive UI cards and layouts styled with our signature **#0F0E0C** dark canvas and **#E96B02** warm accent.\n- 💬 **Architectural Brainstorming**: Discuss software engineering patterns, Clean Architecture, REST API design, caching, and scalable infrastructure.\n\nWhat would you like to explore or automate right now?";
+            }
+            else if (lower.Contains("datacenter") || lower.Contains("data center") || lower.Contains("data-center") || lower.Contains("google"))
+            {
+                reply = "Great question! 🌐 Direct physical server/data center access is protected by enterprise security boundaries, but **you can connect this portfolio directly to Google's AI data centers right now for FREE!** 🚀\n\n### How to link directly to Google's Gemini Cloud:\n1. Head over to **[Google AI Studio](https://aistudio.google.com)** and grab a free API key (zero cost, 1,500 free requests/day).\n2. Open `Backend/appsettings.json` and paste your key into `\"GeminiApiKey\": \"YOUR_KEY\"`.\n3. Instantly, every prompt you send here calls Google's **Gemini 1.5 Flash** models running directly on Google's Tensor Processing Units (TPUs) across Google data centers worldwide!\n\nAlternatively, you can run **Ollama** locally for unlimited offline tokens. Would you like me to walk you through setting that up? 💡";
+            }
+            else if (lower.Contains("architecture") || lower.Contains("how does this work") || lower.Contains("system design") || lower.Contains("backend"))
+            {
+                reply = "Here is a breakdown of the **robust architecture** powering this entire platform! 🏛️\n\n### 1. Backend Core (ASP.NET Core 8 Web API)\n- **Clean Architecture & Repository Pattern**: Clean separation of concerns with domain entities, repositories, and strongly typed controllers.\n- **Entity Framework Core ORM**: Dual-engine database design supporting PostgreSQL on Supabase Cloud and local SQLite with automated auditing and soft-deletion filters.\n- **Security Infrastructure**: JWT Bearer token authentication, refresh token rotation, and BCrypt password encryption.\n\n### 2. Autonomous AI Co-Pilot & WordPress Duplicator\n- **Multi-Provider AI Fallback**: Integrates Ollama (local unlimited), Google Gemini (free cloud), Groq (high-speed), and this built-in autonomous engine.\n- **Duplicator Engine**: Creates standalone JSON database packages and exportable packages mimicking WordPress Duplicator architecture.\n\n### 3. Frontend Experience\n- Responsive, modern vanilla JavaScript and CSS3 architecture adhering to the brand palette: **#0F0E0C** dark canvas and **#E96B02** warm accent.\n\nWould you like to examine or extend any of these subsystems? 🛠️";
+            }
+            else if (lower.Contains("skill") || lower.Contains("tech stack") || lower.Contains("technologies"))
+            {
+                reply = $"Here is the full technical stack currently registered in your portfolio database:\n\n⚡ **{detailedSkills}**\n\n### Architectural Assessment:\nThis stack covers all layers of modern engineering—from strongly-typed backend APIs and relational database modeling to responsive frontend interfaces and AI-driven automation.\n\nWould you like me to add a new skill to the database (e.g. `+ Add skill: Docker / DevOps`), or adjust categories and proficiency levels? 🎯";
+            }
+            else if (lower.Contains("project") || lower.Contains("portfolio") || lower.Contains("work"))
+            {
+                reply = $"Here are the featured engineering projects currently showcased in your database:\n\n{detailedProjects}\n\n### Next Steps:\nEach of these projects illustrates full-stack execution, responsive design, and clean API integration. Would you like me to create a new project in your database right now? Just type:\n`Add project: [Project Title]` and I will scaffold it instantly! 🌟";
+            }
+            else if (lower.Contains("experience") || lower.Contains("career") || lower.Contains("history") || lower.Contains("background"))
+            {
+                reply = $"Here is the career trajectory and work history recorded in the database:\n\n{detailedExperience}\n\n### Career Highlights:\nExtensive experience leading full-lifecycle software delivery, architecting robust cloud backends, and crafting high-performance user interfaces.\n\nWould you like me to register a new career milestone or draft an expanded case study? 💼";
+            }
+            else if (lower.Contains("service") || lower.Contains("offer") || lower.Contains("pricing"))
+            {
+                reply = $"Here are the professional engineering services offered through this platform:\n\n{detailedServices}\n\nFrom high-throughput backend architecture to intuitive frontend UI/UX and database migrations. Would you like to introduce a new service package or refine the descriptions? 🛠️";
             }
             else if (lower.Contains("joke") || lower.Contains("funny") || lower.Contains("laugh"))
             {
@@ -379,37 +434,27 @@ Always maintain an encouraging, collaborative conversational tone!";
                 {
                     "Why do programmers prefer dark mode (**#0F0E0C**)? Because light attracts bugs! 🐛😄",
                     "There are only 10 types of people in the world: those who understand binary, and those who don't! 💻",
-                    "A SQL query walks into a bar, walks up to two tables and asks: *'Can I join you?'* 🍻😂"
+                    "A SQL query walks into a bar, walks up to two tables and asks: *'Can I join you?'* 🍻😂",
+                    "Why did the developer go broke? Because they used up all their cache! 💸😆",
+                    "How many programmers does it take to change a light bulb? None, that's a hardware problem! 💡⚡"
                 };
                 var randomJoke = jokes[new Random().Next(jokes.Length)];
-                reply = $"{randomJoke}\n\nGot any other burning questions or projects we should tackle today? 🚀";
-            }
-            else if (lower.Contains("skill") || lower.Contains("tech stack") || lower.Contains("technologies"))
-            {
-                reply = $"Here's the technical stack powering this platform right now:\n\n⚡ **{skillList}**\n\nWe've got a rock-solid mix of backend architecture, database modeling, and snappy frontend performance! Would you like me to register a new skill or add proficiency ratings to any category? 🎯";
-            }
-            else if (lower.Contains("project") || lower.Contains("portfolio") || lower.Contains("work"))
-            {
-                reply = $"Currently, the portfolio is showcasing these featured projects:\n\n🌟 **{projectList}**\n\nEach project demonstrates clean architecture, responsive layouts, and modern API communication. Would you like me to help you draft a new project idea or generate a case study? ✨";
-            }
-            else if (lower.Contains("service") || lower.Contains("offer") || lower.Contains("pricing"))
-            {
-                reply = $"Here are the primary engineering capabilities currently offered:\n\n💼 **{serviceList}**\n\nFrom end-to-end full stack development to cloud architecture and API integrations. Want to add a new service or adjust the descriptions? 🛠️";
+                reply = $"{randomJoke}\n\nGot any other technical questions, architecture puzzles, or project ideas we should brainstorm? 🚀";
             }
             else if (lower.Contains("thank") || lower.Contains("thanks") || lower.Contains("awesome") || lower.Contains("cool") || lower.Contains("great"))
             {
-                reply = "You're very welcome! 🙌 It's a pleasure collaborating with you. Whenever you want to add content, test a new UI component, or create a site backup, just give me the word! 🚀✨";
+                reply = "You're very welcome! 🙌 It's truly a pleasure collaborating with you. Whenever you want to scaffold a new project, optimize database schemas, design custom UI cards, or export a Duplicator snapshot, I'm right here. Keep up the phenomenal work! 🚀✨";
             }
             else
             {
-                reply = $"That's a great thought! 💡 As your portfolio co-pilot, I'm here to help you brainstorm ideas, refine your site's content, draft new project showcases, or create full backup snapshots with our **#0F0E0C** & **#E96B02** styling.\n\nTell me a bit more about what you have in mind—should we generate a new project, design a UI card, or explore a specific concept together? 🛠️";
+                reply = $"That's a fascinating topic! 💡 As your **AI Site Architect**, I can dive deep into technical system design, brainstorm architectural strategies, or execute direct changes to your portfolio.\n\n### Here is what we can do next:\n- 🚀 **Scaffold a new project**: Tell me the title and tech stack, and I'll create it.\n- 📦 **Create a site backup**: Type *'Backup site'* for an instant WordPress Duplicator snapshot.\n- 🎨 **Generate high-taste UI**: Ask me to design a new component with **#0F0E0C** & **#E96B02** styling.\n- ⚡ **Connect Google Gemini Cloud**: Add your free Gemini API key to `appsettings.json` for full Google data center AI reasoning!\n\nTell me which direction you'd like to take! 🛠️";
             }
 
             var res = new AiChatResponse(
                 reply,
                 null,
                 null,
-                new List<string> { "Add a new project", "Create a Duplicator backup", "Design a UI component", "What skills are registered?" },
+                new List<string> { "Tell me more about the architecture", "Add a new project", "Create a Duplicator backup", "Design a UI component" },
                 "LocalEngine",
                 "Portfolio-Architect-v1"
             );
