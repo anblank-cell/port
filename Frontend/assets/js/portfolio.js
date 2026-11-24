@@ -6,7 +6,9 @@
  */
 
 (() => {
-    const CACHE_KEY = 'cached_portfolio_data';
+    const CACHE_KEY = 'cached_portfolio_data_v3';
+    // Clear legacy corrupted cache if present
+    try { localStorage.removeItem('cached_portfolio_data'); } catch {}
     const { PortfolioAPI, HeroAPI, ProjectsAPI, SkillsAPI, ExperienceAPI, ServicesAPI, ContactAPI, SiteSettingsAPI, MenuItemsAPI } = window.API || {};
 
     const fmtYear = (dateStr) => dateStr ? new Date(dateStr).getFullYear() : null;
@@ -257,14 +259,35 @@
         const navMenu = document.getElementById('navigation-menu');
         if (!navMenu || !items || !items.length) return;
 
-        const visibleItems = items.filter(item => item.isVisible !== false);
-        if (!visibleItems.length) return;
+        // 1. Strict deduplication by normalized title and URL
+        const uniqueItems = [];
+        const seen = new Set();
 
+        items.forEach(item => {
+            if (item.isVisible === false) return;
+            const normTitle = (item.title || '').trim();
+            const normUrl = (item.url || '').trim();
+            const key = `${normTitle.toLowerCase()}|${normUrl.toLowerCase()}`;
+            
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueItems.push(item);
+            }
+        });
+
+        if (!uniqueItems.length) return;
+
+        // 2. Build root and children hierarchy safely
         const rootItems = [];
         const childrenMap = new Map();
 
-        visibleItems.forEach(item => {
-            if (item.parentId) {
+        uniqueItems.forEach(item => {
+            // Guard: parent must exist in uniqueItems and not be self
+            const hasValidParent = item.parentId && 
+                                   item.parentId !== item.id && 
+                                   uniqueItems.some(u => u.id === item.parentId);
+
+            if (hasValidParent) {
                 if (!childrenMap.has(item.parentId)) {
                     childrenMap.set(item.parentId, []);
                 }
@@ -300,9 +323,12 @@
         };
 
         const loginPath = window.location.pathname.includes('/public/') ? '../../admin/pages/login.html' : 'admin/pages/login.html';
-        const loginBtnHTML = `<li><a href="${loginPath}" class="btn btn-secondary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;" id="login-button">Admin Login</a></li>`;
+        const loginBtnHTML = `<li><a href="${loginPath}" class="btn btn-secondary" id="login-button">Admin Login</a></li>`;
 
-        navMenu.innerHTML = rootItems.map(item => renderItemHTML(item, false)).join('') + loginBtnHTML;
+        navMenu.innerHTML = rootItems
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map(item => renderItemHTML(item, false))
+            .join('') + loginBtnHTML;
     };
 
     const renderAll = (data) => {

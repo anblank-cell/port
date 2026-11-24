@@ -144,6 +144,21 @@ namespace Backend.Seed
                         }
                     }
                 }
+
+                // Ensure deduplication in case multiple runs added duplicate items
+                var allMenuItems = await context.MenuItems.IgnoreQueryFilters().ToListAsync();
+                var duplicateItems = allMenuItems
+                    .GroupBy(i => new { Title = i.Title.Trim().ToLower(), Url = i.Url.Trim().ToLower() })
+                    .Where(g => g.Count() > 1)
+                    .SelectMany(g => g.Skip(1))
+                    .ToList();
+
+                if (duplicateItems.Any())
+                {
+                    context.MenuItems.RemoveRange(duplicateItems);
+                    await context.SaveChangesAsync();
+                    logger.LogInformation("Removed {Count} duplicate menu items from database.", duplicateItems.Count);
+                }
             }
             catch (Exception ex)
             {
