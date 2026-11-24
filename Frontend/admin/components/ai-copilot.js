@@ -39,7 +39,10 @@ window.AiCopilotManager = (function () {
                         </div>
                         <div>
                             <div style="font-weight:700; font-size:15px; color:#FAF9F6;">AI Site Architect</div>
-                            <div style="font-size:11px; color:#E96B02; font-weight:600;"><i class="fa-solid fa-circle" style="font-size:8px; margin-right:4px;"></i>Ready for instructions</div>
+                            <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                                <span style="font-size:10px; color:#E96B02; font-weight:700;"><i class="fa-solid fa-circle" style="font-size:7px; margin-right:3px;"></i>Active</span>
+                                <span id="ai-engine-badge" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.35); color:#FAF9F6; font-size:10px; padding:1px 6px; border-radius:8px; cursor:pointer;" title="Click for Free AI Setup">Engine: Auto</span>
+                            </div>
                         </div>
                     </div>
                     <button id="ai-copilot-close" style="background:none; border:none; color:#A8A29E; font-size:18px; cursor:pointer;" title="Close">&times;</button>
@@ -96,6 +99,28 @@ window.AiCopilotManager = (function () {
                 sendMessage();
             };
         });
+
+        // Engine Status & Free Setup Dialog
+        const badge = document.getElementById('ai-engine-badge');
+        if (badge) {
+            badge.onclick = () => {
+                const info = `FREE UNLIMITED AI OPTIONS:
+1. Ollama (100% Free & Unlimited on your Desktop):
+   Install: Run 'winget install Ollama.Ollama'
+   Then run: 'ollama run llama3.2'
+   The app will automatically detect it on http://localhost:11434 with zero API keys and unlimited tokens!
+
+2. OpenRouter (:free models):
+   Sign up free on openrouter.ai and use models ending in ':free' (DeepSeek-R1, Llama 3.3).
+
+3. Google Gemini (Free Tier):
+   Google AI Studio gives 1,500 free requests/day with Gemini 1.5/2.0 Flash.
+
+4. Built-in Local Engine:
+   Always available offline fallback with direct database actions.`;
+                alert(info);
+            };
+        }
     }
 
     function toggle(force) {
@@ -136,7 +161,7 @@ window.AiCopilotManager = (function () {
             removeMessage(loadingId);
 
             if (data && data.success && data.data) {
-                appendMessage('ai', data.data.reply, data.data.generatedHtml, data.data.actionExecuted);
+                appendMessage('ai', data.data.reply, data.data.generatedHtml, data.data.actionExecuted, data.data.providerUsed, data.data.modelUsed);
             } else {
                 appendMessage('ai', data?.message || 'Sorry, I encountered an error executing that request.');
             }
@@ -146,7 +171,7 @@ window.AiCopilotManager = (function () {
         }
     }
 
-    function appendMessage(sender, text, htmlPreview, action) {
+    function appendMessage(sender, text, htmlPreview, action, provider, model) {
         const container = document.getElementById('ai-copilot-messages');
         const msg = document.createElement('div');
         msg.style.cssText = sender === 'user'
@@ -154,6 +179,15 @@ window.AiCopilotManager = (function () {
             : 'align-self:flex-start; background:#171512; border:1px solid rgba(233,107,2,0.25); color:#FAF9F6; padding:12px 14px; border-radius:12px 12px 12px 2px; max-width:90%; font-size:13px; line-height:1.5;';
 
         let inner = `<div>${text}</div>`;
+
+        if (provider) {
+            inner += `
+                <div style="margin-top:6px; font-size:10px; color:#A8A29E; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-microchip" style="color:#E96B02;"></i>
+                    <span>Provider: <strong>${provider}</strong> ${model ? `(${model})` : ''}</span>
+                </div>
+            `;
+        }
 
         if (action) {
             inner += `

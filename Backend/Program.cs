@@ -72,10 +72,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure Security & Communication Services Dependency Injection
+// Configure Security, AI & Communication Services Dependency Injection
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+// Configure AI Multi-Provider Service (Ollama, OpenRouter Free, Gemini Free Tier, Groq)
+var aiSection = builder.Configuration.GetSection("AiSettings");
+builder.Services.Configure<AiSettings>(aiSection);
+builder.Services.AddHttpClient<IAiService, AiService>();
 
 // Configure CORS for Frontend API consumption
 builder.Services.AddCors(options =>

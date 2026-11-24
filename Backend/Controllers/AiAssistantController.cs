@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Data;
 using Backend.Entities;
+using Backend.Interfaces;
 using Backend.Models;
 
 namespace Backend.Controllers
@@ -20,10 +21,12 @@ namespace Backend.Controllers
     public class AiAssistantController : ControllerBase
     {
         private readonly PortfolioDbContext _context;
+        private readonly IAiService _aiService;
 
-        public AiAssistantController(PortfolioDbContext context)
+        public AiAssistantController(PortfolioDbContext context, IAiService aiService)
         {
             _context = context;
+            _aiService = aiService;
         }
 
         public record AiChatRequest(string Message, string? Context, bool? IsAdmin);
@@ -34,8 +37,36 @@ namespace Backend.Controllers
             string Reply,
             string? GeneratedHtml,
             AiActionExecuted? ActionExecuted,
-            List<string> SuggestedFollowUps
+            List<string> SuggestedFollowUps,
+            string? ProviderUsed = null,
+            string? ModelUsed = null
         );
+
+        [HttpGet("providers")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ApiResponse<List<AiProviderInfo>>>> GetProviders()
+        {
+            var providers = await _aiService.GetAvailableProvidersAsync();
+            return Ok(ApiResponse<List<AiProviderInfo>>.SuccessResponse(providers));
+        }
+
+        [HttpGet("status")]
+        [AllowAnonymous]
+        public ActionResult<ApiResponse<object>> GetStatus()
+        {
+            return Ok(ApiResponse<object>.SuccessResponse(new
+            {
+                activeProvider = _aiService.GetActiveProviderName(),
+                timestampUtc = DateTime.UtcNow,
+                freeUnlimitedSources = new[]
+                {
+                    new { name = "Ollama", type = "Local Desktop (100% Free & Unlimited)", endpoint = "http://localhost:11434", models = new[] { "llama3.2", "qwen2.5-coder", "mistral", "deepseek-r1:8b" } },
+                    new { name = "OpenRouter", type = "Cloud Free Tier (:free tags)", endpoint = "https://openrouter.ai", models = new[] { "meta-llama/llama-3.2-3b-instruct:free", "deepseek/deepseek-r1:free" } },
+                    new { name = "Google Gemini", type = "Google AI Studio Free Tier", endpoint = "https://aistudio.google.com", models = new[] { "gemini-1.5-flash", "gemini-2.0-flash" } },
+                    new { name = "Groq Cloud", type = "Ultra-Fast LPU Free Tier", endpoint = "https://groq.com", models = new[] { "llama-3.3-70b-versatile" } }
+                }
+            }));
+        }
 
         [HttpGet("capabilities")]
         [AllowAnonymous]
@@ -43,6 +74,7 @@ namespace Backend.Controllers
         {
             var capabilities = new List<string>
             {
+                "Multi-Provider AI support (Ollama local unlimited, OpenRouter free, Gemini, Groq)",
                 "Create new Projects autonomously from natural language prompts",
                 "Add new Skills with category and proficiency percentage",
                 "Add new Professional Services with icon designations",
@@ -285,15 +317,32 @@ namespace Backend.Controllers
 
         private async Task<ActionResult<ApiResponse<AiChatResponse>>> HandleKnowledgeQuery(string prompt)
         {
-            var projects = await _context.Projects.AsNoTracking().Take(5).ToListAsync();
-            var skills = await _context.Skills.AsNoTracking().Take(8).ToListAsync();
-            var services = await _context.Services.AsNoTracking().Take(4).ToListAsync();
-            var hero = await _context.HeroSections.AsNoTracking().FirstOrDefaultAsync();
+            var projects = await _context.Projects.AsNoTracking().Take(6).ToListAsync();
+            var skills = await _context.Skills.AsNoTracking().Take(10).ToListAsync();
+            var services = await _context.Services.AsNoTracking().Take(6).ToListAsync();
 
             var projectList = string.Join(", ", projects.Select(p => p.Title));
             var skillList = string.Join(", ", skills.Select(s => s.Name));
             var serviceList = string.Join(", ", services.Select(s => s.Name));
 
+            // 1. Attempt LLM generation via Ollama (Local Unlimited), OpenRouter Free, Gemini, or Groq
+            var systemPrompt = $"You are the AI Site Architect for an enterprise portfolio platform built with ASP.NET Core and modern frontend architecture. The design system uses #0F0E0C as primary dark background and #E96B02 as primary warm accent. Current portfolio database:\n- Projects: {projectList}\n- Skills: {skillList}\n- Services: {serviceList}\nAnswer clearly and accurately. Highlight your capability to create projects, add skills, or export WordPress Duplicator snapshots.";
+
+            var aiResult = await _aiService.GenerateChatCompletionAsync(prompt, systemPrompt);
+            if (!string.IsNullOrWhiteSpace(aiResult.Text))
+            {
+                var llmRes = new AiChatResponse(
+                    aiResult.Text,
+                    null,
+                    null,
+                    new List<string> { "Add a new project", "Create a Duplicator backup", "Design a UI component", "What skills are registered?" },
+                    aiResult.ProviderUsed,
+                    aiResult.ModelUsed
+                );
+                return Ok(ApiResponse<AiChatResponse>.SuccessResponse(llmRes));
+            }
+
+            // 2. Built-in Local Autonomous Engine Fallback
             string reply;
             var lower = prompt.ToLowerInvariant();
 
@@ -311,15 +360,20 @@ namespace Backend.Controllers
             }
             else
             {
-                reply = $"Hello! I am your **AI Site Architect & Assistant**. I can help you manage your portfolio, create and clone projects, add skills or services, generate Duplicator backups, or design high-taste UI components with your signature **#0F0E0C** and **#E96B02** styling. What would you like to build or automate?";
+                reply = $"Hello! I am your **AI Site Architect & Assistant** powered by a unified multi-provider engine (Ollama Local Unlimited, OpenRouter Free, Gemini Free Tier, and Built-in Autonomous Engine). What would you like to build or automate?";
             }
 
             var res = new AiChatResponse(
                 reply,
                 null,
                 null,
-                new List<string> { "Add a new project", "Create a Duplicator backup", "Design a UI component", "What skills are registered?" }
+                new List<string> { "Add a new project", "Create a Duplicator backup", "Design a UI component", "What skills are registered?" },
+                "LocalEngine",
+                "Portfolio-Architect-v1"
             );
+
+            return Ok(ApiResponse<AiChatResponse>.SuccessResponse(res));
+        }
 
             return Ok(ApiResponse<AiChatResponse>.SuccessResponse(res));
         }
