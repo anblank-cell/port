@@ -15,7 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function formatMarkdown(text) {
         if (!text) return '';
-        return text
+        // Handle fenced code blocks with dark #0F0E0C background and #E96B02 border
+        let formatted = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+            const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const label = lang ? `<div style="font-size:10px; color:#E96B02; font-weight:bold; margin-bottom:6px; text-transform:uppercase;">${lang}</div>` : '';
+            return `<div style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); border-radius:8px; padding:12px; margin:10px 0; overflow-x:auto;"><pre style="margin:0; font-family:monospace; font-size:12px; color:#FAF9F6; line-height:1.45;">${label}<code>${escaped}</code></pre></div>`;
+        });
+
+        return formatted
             .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#FAF9F6;">$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             .replace(/`([^`]+)`/g, '<code style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:2px 5px; border-radius:4px; font-size:12px;">$1</code>')
