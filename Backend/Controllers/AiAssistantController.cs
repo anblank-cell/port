@@ -374,8 +374,5 @@ namespace Backend.Controllers
 
             return Ok(ApiResponse<AiChatResponse>.SuccessResponse(res));
         }
-
-            return Ok(ApiResponse<AiChatResponse>.SuccessResponse(res));
-        }
     }
 }
