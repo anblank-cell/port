@@ -32,194 +32,558 @@
 
 <body>
 
-    <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
-    <aside class="sidebar" id="sidebar">
+    <!-- ── Authentic WordPress Top Bar (#wpadminbar) ────────────────────────── -->
+    <div id="wpadminbar">
+        <div class="quicklinks" id="wp-toolbar" role="navigation" aria-label="Toolbar">
+            <!-- Left Side Tools -->
+            <ul id="wp-admin-bar-root-default" class="ab-top-menu">
+                <!-- WordPress Logo & Info -->
+                <li id="wp-admin-bar-wp-logo" class="menupop">
+                    <a class="ab-item" href="#overview" aria-haspopup="true">
+                        <span class="ab-icon"><i class="fa-brands fa-wordpress" style="font-size:16px;"></i></span>
+                    </a>
+                    <div class="ab-sub-wrapper">
+                        <ul class="ab-submenu">
+                            <li><a href="#overview"><i class="fa-solid fa-gauge-high"></i> About Portfolio CMS</a></li>
+                            <li><a href="#duplicator"><i class="fa-solid fa-clone"></i> WordPress Duplicator Pro</a></li>
+                            <li><a href="https://github.com/anblank-cell/port" target="_blank"><i class="fa-brands fa-github"></i> GitHub Repository</a></li>
+                        </ul>
+                    </div>
+                </li>
 
-        <!-- Brand -->
-        <div class="sidebar-brand">
-            <div class="brand-loader-wrap">
-                <div class="loader">
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                </div>
-            </div>
-            <div>
-                <div class="brand-text">Portfolio CMS</div>
-                <div class="brand-sub">Admin Panel</div>
-            </div>
+                <!-- Site Name & Visit Site -->
+                <li id="wp-admin-bar-site-name" class="menupop">
+                    <a class="ab-item" href="../../index.html" target="_blank" aria-haspopup="true">
+                        <span class="ab-icon"><i class="fa-solid fa-house"></i></span>
+                        <span class="site-name">Portfolio</span>
+                    </a>
+                    <div class="ab-sub-wrapper">
+                        <ul class="ab-submenu">
+                            <li><a href="../../index.html" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Portfolio</a></li>
+                            <li><a href="#pages"><i class="fa-regular fa-copy"></i> Manage Pages</a></li>
+                            <li><a href="#menuitems"><i class="fa-solid fa-bars-staggered"></i> Navigation Menus</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Comments / Messages Indicator -->
+                <li id="wp-admin-bar-comments">
+                    <a class="ab-item" href="#messages" title="Inquiries & Messages">
+                        <span class="ab-icon"><i class="fa-solid fa-comment"></i></span>
+                        <span class="ab-label awaiting-mod pending-count" id="topbar-unread-badge">0</span>
+                    </a>
+                </li>
+
+                <!-- + New Quick Dropdown -->
+                <li id="wp-admin-bar-new-content" class="menupop">
+                    <a class="ab-item" href="#projects" aria-haspopup="true">
+                        <span class="ab-icon"><i class="fa-solid fa-plus"></i></span>
+                        <span class="ab-label">New</span>
+                    </a>
+                    <div class="ab-sub-wrapper">
+                        <ul class="ab-submenu">
+                            <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('projects'); setTimeout(() => window.ProjectsManager?.openCreateModal?.(), 200);"><i class="fa-solid fa-diagram-project"></i> Project</a></li>
+                            <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('services'); setTimeout(() => window.ServicesManager?.openCreateModal?.(), 200);"><i class="fa-solid fa-briefcase"></i> Service</a></li>
+                            <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('skills'); setTimeout(() => window.SkillsManager?.openCreateModal?.(), 200);"><i class="fa-solid fa-bolt"></i> Skill</a></li>
+                            <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('media');"><i class="fa-solid fa-photo-film"></i> Media Upload</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- WP Duplicator Pro Shortcut -->
+                <li id="wp-admin-bar-duplicator" class="menupop">
+                    <a class="ab-item" href="#duplicator" style="color:var(--accent);">
+                        <span class="ab-icon" style="color:var(--accent);"><i class="fa-solid fa-clone"></i></span>
+                        <span class="ab-label" style="font-weight:700;">WP Duplicator</span>
+                    </a>
+                    <div class="ab-sub-wrapper">
+                        <ul class="ab-submenu">
+                            <li><a href="#duplicator"><i class="fa-solid fa-boxes-stacked"></i> Duplicator Dashboard</a></li>
+                            <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('duplicator'); setTimeout(() => window.DuplicatorManager?.createPackage?.(), 200);"><i class="fa-solid fa-box-archive"></i> 1-Click Full Backup</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Right Side Tools -->
+            <ul id="wp-admin-bar-top-secondary" class="ab-top-secondary ab-top-menu">
+                <!-- Command Palette Shortcut -->
+                <li id="wp-admin-bar-command-palette">
+                    <a class="ab-item" href="javascript:void(0)" onclick="window.CommandPalette?.toggle();" title="Command Palette (Ctrl + K)">
+                        <kbd>Ctrl</kbd>+<kbd>K</kbd>
+                    </a>
+                </li>
+
+                <!-- Theme Toggle -->
+                <li id="wp-admin-bar-theme-toggle">
+                    <button class="ab-item" id="theme-toggle-btn" style="background:none; border:none; cursor:pointer;" title="Toggle Theme">
+                        <i class="fa-solid fa-sun" id="theme-icon"></i>
+                        <span id="theme-text">Light</span>
+                    </button>
+                </li>
+
+                <!-- User Account Dropdown -->
+                <li id="wp-admin-bar-my-account" class="menupop with-avatar">
+                    <a class="ab-item" href="#sitesettings" aria-haspopup="true">
+                        <span>Howdy, <strong id="topbar-user-name">Admin</strong></span>
+                        <span class="avatar-circle">A</span>
+                    </a>
+                    <div class="ab-sub-wrapper">
+                        <ul class="ab-submenu">
+                            <li class="user-info-item">
+                                <div class="user-info-wrap">
+                                    <div class="avatar-large">A</div>
+                                    <div>
+                                        <div class="user-display" id="profile-user-email">admin@portfolio.com</div>
+                                        <div class="user-role-label">Administrator</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><a href="#sitesettings"><i class="fa-solid fa-user-gear"></i> Edit Profile &amp; Settings</a></li>
+                            <li><a href="javascript:void(0)" id="topbar-logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
         </div>
+    </div>
 
-        <!-- Navigation -->
-        <nav class="sidebar-nav">
+    <!-- ── Authentic WordPress Left Sidebar Menu (#adminmenumain) ─────────── -->
+    <div id="adminmenumain" role="navigation" aria-label="Main menu">
+        <div id="adminmenuback"></div>
+        <div id="adminmenuwrap">
+            <ul id="adminmenu">
 
-            <!-- Overview -->
-            <div class="nav-section-label">Overview</div>
-            <div class="nav-item active" data-panel="overview" id="nav-overview">
-                <span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span> Dashboard
-            </div>
+                <!-- 1. Dashboard -->
+                <li class="menu-top wp-has-submenu wp-has-current-submenu current" id="menu-dashboard" data-panel="overview">
+                    <a href="#overview" class="menu-top" data-panel="overview">
+                        <div class="wp-menu-image"><i class="fa-solid fa-gauge-high"></i></div>
+                        <div class="wp-menu-name">Dashboard</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Dashboard</li>
+                        <li><a href="#overview" data-panel="overview">Home</a></li>
+                        <li><a href="#swaggerdocs" data-panel="swaggerdocs">API Reference</a></li>
+                    </ul>
+                </li>
 
-            <!-- Content -->
-            <div class="nav-section-label">Content</div>
-            <div class="nav-item" data-panel="pages" id="nav-pages">
-                <span class="nav-icon"><i class="fa-regular fa-copy"></i></span> Pages
-            </div>
+                <li class="wp-menu-separator"><div class="separator"></div></li>
 
-            <!-- Media (separate, top-level) -->
-            <div class="nav-item" data-panel="media" id="nav-media">
-                <span class="nav-icon"><i class="fa-solid fa-photo-film"></i></span> Media Library
-            </div>
+                <!-- 2. Projects (Posts equivalent) -->
+                <li class="menu-top wp-has-submenu" id="menu-projects" data-panel="projects">
+                    <a href="#projects" class="menu-top" data-panel="projects">
+                        <div class="wp-menu-image"><i class="fa-solid fa-diagram-project"></i></div>
+                        <div class="wp-menu-name">Projects</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Projects</li>
+                        <li><a href="#projects" data-panel="projects">All Projects</a></li>
+                        <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('projects'); setTimeout(() => window.ProjectsManager?.openCreateModal?.(), 200);">Add New Project</a></li>
+                    </ul>
+                </li>
 
-            <!-- Appearance (Dropdown) -->
-            <div class="nav-section-label">Appearance</div>
-            <div class="nav-group" id="nav-group-appearance">
-                <div class="nav-item nav-item-parent" id="nav-item-appearance" data-panel="appearance">
-                    <span class="nav-icon"><i class="fa-solid fa-paintbrush"></i></span>
-                    <span class="nav-label" style="font-weight:600;">Appearance</span>
-                    <span class="nav-arrow"><i class="fa-solid fa-chevron-down"></i></span>
-                </div>
-                <div class="nav-submenu" id="nav-submenu-appearance">
-                    <div class="nav-subitem" data-panel="menuitems" id="nav-menuitems">
-                        <i class="fa-solid fa-bars-staggered"></i> Navigation Menu
-                    </div>
-                </div>
-            </div>
+                <!-- 3. Media -->
+                <li class="menu-top wp-has-submenu" id="menu-media" data-panel="media">
+                    <a href="#media" class="menu-top" data-panel="media">
+                        <div class="wp-menu-image"><i class="fa-solid fa-photo-film"></i></div>
+                        <div class="wp-menu-name">Media</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Media</li>
+                        <li><a href="#media" data-panel="media">Library</a></li>
+                        <li><a href="#media" data-panel="media">Add New</a></li>
+                    </ul>
+                </li>
 
-            <!-- Communication -->
-            <div class="nav-section-label">Communication</div>
-            <div class="nav-item" data-panel="messages">
-                <span class="nav-icon"><i class="fa-solid fa-envelope"></i></span> Messages
-                <span class="nav-badge" id="unread-badge" style="display:none">0</span>
-            </div>
+                <!-- 4. Pages -->
+                <li class="menu-top wp-has-submenu" id="menu-pages" data-panel="pages">
+                    <a href="#pages" class="menu-top" data-panel="pages">
+                        <div class="wp-menu-image"><i class="fa-regular fa-file-lines"></i></div>
+                        <div class="wp-menu-name">Pages</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Pages</li>
+                        <li><a href="#pages" data-panel="pages">All Pages</a></li>
+                        <li><a href="#hero" data-panel="hero">Hero Section</a></li>
+                    </ul>
+                </li>
 
-            <!-- Developer -->
-            <div class="nav-section-label">Developer</div>
-            <div class="nav-group" id="nav-group-plugins">
-                <div class="nav-item nav-item-parent" id="nav-item-plugins" data-panel="plugins-installed">
-                    <span class="nav-icon"><i class="fa-solid fa-plug"></i></span>
-                    <span class="nav-label" style="font-weight:600;">Plugins</span>
-                    <span class="nav-arrow"><i class="fa-solid fa-chevron-down"></i></span>
-                </div>
-                <div class="nav-submenu" id="nav-submenu-plugins">
-                    <div class="nav-subitem" data-panel="plugins-installed" id="nav-plugins-installed">
-                        Installed Plugins
-                    </div>
-                    <div class="nav-subitem" data-panel="plugins-add" id="nav-plugins-add">
-                        Add Plugin
-                    </div>
-                </div>
-            </div>
-            <div class="nav-item" data-panel="duplicator" id="nav-duplicator">
-                <span class="nav-icon" style="color:var(--accent);"><i class="fa-solid fa-clone"></i></span> WP Duplicator
-            </div>
-            <div class="nav-item" data-panel="fileorganizer" id="nav-fileorganizer" style="display:none;">
-                <span class="nav-icon"><i class="fa-solid fa-folder-tree"></i></span> File Organizer
-            </div>
-            <div class="nav-item" data-panel="swaggerdocs" id="nav-swaggerdocs" style="display:none;">
-                <span class="nav-icon"><i class="fa-solid fa-code"></i></span> API Docs
-            </div>
+                <!-- 5. Services -->
+                <li class="menu-top wp-has-submenu" id="menu-services" data-panel="services">
+                    <a href="#services" class="menu-top" data-panel="services">
+                        <div class="wp-menu-image"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="wp-menu-name">Services</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Services</li>
+                        <li><a href="#services" data-panel="services">All Services</a></li>
+                        <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('services'); setTimeout(() => window.ServicesManager?.openCreateModal?.(), 200);">Add New Service</a></li>
+                    </ul>
+                </li>
 
-            <!-- Settings -->
-            <div class="nav-section-label">Settings</div>
-            <div class="nav-item" data-panel="sitesettings" id="nav-sitesettings">
-                <span class="nav-icon"><i class="fa-solid fa-sliders"></i></span> Site Settings
-            </div>
-            <div class="nav-item" data-panel="emailsettings" id="nav-emailsettings">
-                <span class="nav-icon"><i class="fa-solid fa-envelope-circle-check"></i></span> Email Configuration
-            </div>
+                <!-- 6. Skills -->
+                <li class="menu-top wp-has-submenu" id="menu-skills" data-panel="skills">
+                    <a href="#skills" class="menu-top" data-panel="skills">
+                        <div class="wp-menu-image"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="wp-menu-name">Skills</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Skills</li>
+                        <li><a href="#skills" data-panel="skills">Skill Inventory</a></li>
+                        <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('skills'); setTimeout(() => window.SkillsManager?.openCreateModal?.(), 200);">Add New Skill</a></li>
+                    </ul>
+                </li>
 
-        </nav>
+                <!-- 7. Experience -->
+                <li class="menu-top wp-has-submenu" id="menu-experience" data-panel="experience">
+                    <a href="#experience" class="menu-top" data-panel="experience">
+                        <div class="wp-menu-image"><i class="fa-solid fa-user-graduate"></i></div>
+                        <div class="wp-menu-name">Experience</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Experience</li>
+                        <li><a href="#experience" data-panel="experience">Work Experience</a></li>
+                        <li><a href="#education" data-panel="education">Education</a></li>
+                        <li><a href="#certificates" data-panel="certificates">Certificates</a></li>
+                    </ul>
+                </li>
 
-        <!-- User Footer -->
-        <div class="sidebar-footer">
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <div class="user-details">
-                    <div class="user-name" id="sidebar-user-email">Admin</div>
-                    <div class="user-role">Administrator</div>
-                </div>
-            </div>
-            <button class="logout-btn" id="logout-btn" title="Sign Out">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
+                <!-- 8. Feedback -->
+                <li class="menu-top wp-has-submenu" id="menu-feedback" data-panel="testimonials">
+                    <a href="#testimonials" class="menu-top" data-panel="testimonials">
+                        <div class="wp-menu-image"><i class="fa-regular fa-comments"></i></div>
+                        <div class="wp-menu-name">Feedback</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Feedback</li>
+                        <li><a href="#testimonials" data-panel="testimonials">Testimonials</a></li>
+                        <li><a href="#statistics" data-panel="statistics">Key Statistics</a></li>
+                    </ul>
+                </li>
+
+                <!-- 9. Messages (Comments equivalent) -->
+                <li class="menu-top" id="menu-messages" data-panel="messages">
+                    <a href="#messages" class="menu-top" data-panel="messages">
+                        <div class="wp-menu-image"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="wp-menu-name">
+                            Messages
+                            <span class="update-plugins count-0" id="sidebar-unread-badge"><span class="plugin-count" id="sidebar-unread-count">0</span></span>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="wp-menu-separator"><div class="separator"></div></li>
+
+                <!-- 10. Appearance -->
+                <li class="menu-top wp-has-submenu" id="menu-appearance" data-panel="menuitems">
+                    <a href="#menuitems" class="menu-top" data-panel="menuitems">
+                        <div class="wp-menu-image"><i class="fa-solid fa-paintbrush"></i></div>
+                        <div class="wp-menu-name">Appearance</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Appearance</li>
+                        <li><a href="#menuitems" data-panel="menuitems">Menus</a></li>
+                        <li><a href="#social" data-panel="social">Social Links</a></li>
+                    </ul>
+                </li>
+
+                <!-- 11. Plugins -->
+                <li class="menu-top wp-has-submenu" id="menu-plugins" data-panel="plugins-installed">
+                    <a href="#plugins-installed" class="menu-top" data-panel="plugins-installed">
+                        <div class="wp-menu-image"><i class="fa-solid fa-plug"></i></div>
+                        <div class="wp-menu-name">Plugins</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Plugins</li>
+                        <li><a href="#plugins-installed" data-panel="plugins-installed">Installed Plugins</a></li>
+                        <li><a href="#plugins-add" data-panel="plugins-add">Add New Plugin</a></li>
+                    </ul>
+                </li>
+
+                <!-- 12. WP Duplicator Pro (Featured) -->
+                <li class="menu-top wp-has-submenu" id="menu-duplicator" data-panel="duplicator">
+                    <a href="#duplicator" class="menu-top" data-panel="duplicator" style="color:var(--accent);">
+                        <div class="wp-menu-image" style="color:var(--accent);"><i class="fa-solid fa-clone"></i></div>
+                        <div class="wp-menu-name" style="font-weight:700; color:var(--accent);">WP Duplicator</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">WP Duplicator Pro</li>
+                        <li><a href="#duplicator" data-panel="duplicator">Packages &amp; Cloner</a></li>
+                        <li><a href="javascript:void(0)" onclick="window.switchAdminPanel('duplicator'); setTimeout(() => window.DuplicatorManager?.createPackage?.(), 200);">1-Click Full Backup</a></li>
+                    </ul>
+                </li>
+
+                <!-- 13. Tools -->
+                <li class="menu-top wp-has-submenu" id="menu-tools" data-panel="fileorganizer">
+                    <a href="#fileorganizer" class="menu-top" data-panel="fileorganizer">
+                        <div class="wp-menu-image"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                        <div class="wp-menu-name">Tools</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Tools</li>
+                        <li><a href="#fileorganizer" data-panel="fileorganizer" id="nav-fileorganizer">File Organizer</a></li>
+                        <li><a href="#swaggerdocs" data-panel="swaggerdocs" id="nav-swaggerdocs">REST API Documentation</a></li>
+                    </ul>
+                </li>
+
+                <!-- 14. Settings -->
+                <li class="menu-top wp-has-submenu" id="menu-settings" data-panel="sitesettings">
+                    <a href="#sitesettings" class="menu-top" data-panel="sitesettings">
+                        <div class="wp-menu-image"><i class="fa-solid fa-gear"></i></div>
+                        <div class="wp-menu-name">Settings</div>
+                    </a>
+                    <ul class="wp-submenu">
+                        <li class="wp-submenu-head">Settings</li>
+                        <li><a href="#sitesettings" data-panel="sitesettings">General Settings</a></li>
+                        <li><a href="#emailsettings" data-panel="emailsettings">Email Configuration</a></li>
+                    </ul>
+                </li>
+
+                <!-- 15. Collapse Menu Button -->
+                <li id="collapse-menu">
+                    <button type="button" id="collapse-button" aria-label="Collapse Main menu">
+                        <i class="fa-solid fa-chevron-left" id="collapse-icon"></i>
+                        <span class="collapse-button-label">Collapse menu</span>
+                    </button>
+                </li>
+
+            </ul>
         </div>
+    </div>
 
-    </aside>
+    <!-- ── WordPress Main Content Canvas (#wpcontent) ────────────────────────── -->
+    <div id="wpcontent" class="main-content">
+        <div id="wpbody" role="main">
+            <div id="wpbody-content" class="wrap">
 
-    <!-- ── Main Content ─────────────────────────────────────────────────────── -->
-    <div class="main-content">
+                <!-- ── 1. OVERVIEW PANEL (Authentic WordPress Dashboard) ────────────────── -->
+                <section class="panel active" id="panel-overview">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <div>
+                            <h1 class="wp-heading-inline">Dashboard</h1>
+                            <a href="javascript:void(0)" onclick="window.switchAdminPanel('projects'); setTimeout(() => window.ProjectsManager?.openCreateModal?.(), 200);" class="page-title-action">
+                                <i class="fa-solid fa-plus"></i> Add New Project
+                            </a>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="button" onclick="window.location.reload();" title="Refresh Dashboard Data">
+                                <i class="fa-solid fa-rotate"></i> Refresh
+                            </button>
+                            <button class="button-primary" onclick="window.switchAdminPanel('duplicator'); setTimeout(() => window.DuplicatorManager?.createPackage?.(), 200);">
+                                <i class="fa-solid fa-clone"></i> 1-Click Backup
+                            </button>
+                        </div>
+                    </div>
 
-        <!-- Topbar -->
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="mobile-toggle" id="mobile-sidebar-toggle">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-                <div class="topbar-title" id="topbar-title">Dashboard Overview</div>
-            </div>
-            <div class="topbar-right">
-                <button class="topbar-btn" id="theme-toggle-btn">
-                    <i class="fa-solid fa-sun" id="theme-icon"></i>
-                    <span id="theme-text">Light</span>
-                </button>
-                <a class="topbar-btn" href="../../index.html" target="_blank">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> View Portfolio
-                </a>
-            </div>
-        </header>
+                    <!-- Welcome Panel -->
+                    <div class="welcome-panel">
+                        <div class="welcome-panel-content">
+                            <div class="welcome-panel-header">
+                                <div>
+                                    <h2>Welcome to Portfolio CMS &amp; WordPress Duplicator!</h2>
+                                    <p>We've assembled some links to help you manage your portfolio, customize pages, or perform snapshot backups.</p>
+                                </div>
+                                <span class="badge" style="background:#E96B02; color:#0F0E0C; font-weight:700;">PRO ENGINE ACTIVE</span>
+                            </div>
 
-        <!-- ── OVERVIEW PANEL ─────────────────────────────────────────────── -->
-        <section class="panel active" id="panel-overview">
-            <div class="section-hdr">
-                <div>
-                    <h2>Dashboard Overview</h2>
-                    <p>Welcome back! Quick summary of your portfolio system content.</p>
-                </div>
-            </div>
-            <!-- Stats Grid -->
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1.25rem;margin-bottom:2rem;">
-                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.25rem;">
-                    <div style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">PROJECTS</div>
-                    <div style="font-size:1.8rem;font-weight:700;color:var(--text-primary);" id="dash-stat-projects">0</div>
-                </div>
-                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.25rem;">
-                    <div style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">SKILLS</div>
-                    <div style="font-size:1.8rem;font-weight:700;color:var(--text-primary);" id="dash-stat-skills">0</div>
-                </div>
-                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1.25rem;">
-                    <div style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">MESSAGES</div>
-                    <div style="font-size:1.8rem;font-weight:700;color:var(--text-primary);" id="dash-stat-messages">0</div>
-                </div>
-            </div>
-        </section>
+                            <div class="welcome-panel-column-container">
+                                <!-- Column 1: Get Started -->
+                                <div class="welcome-panel-column">
+                                    <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Get Started</h3>
+                                    <p style="font-size:13px; color:#A8A29E; margin-bottom:12px;">Launch tools to design and shape your portfolio site:</p>
+                                    <button class="button-primary" style="margin-bottom:12px;" onclick="window.AiCopilotManager?.toggle(true);">
+                                        <i class="fa-solid fa-sparkles"></i> Launch AI Site Architect
+                                    </button>
+                                    <ul>
+                                        <li><a href="#hero"><i class="fa-solid fa-pen-nib"></i> Edit Hero Section Banner</a></li>
+                                        <li><a href="#menuitems"><i class="fa-solid fa-bars"></i> Customize Navigation Menus</a></li>
+                                        <li><a href="../../index.html" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Live Portfolio</a></li>
+                                    </ul>
+                                </div>
 
-        <!-- ── DYNAMIC PANEL SHELLS (filled by JS managers) ──────────────── -->
-        <section class="panel" id="panel-pages"></section>
-        <section class="panel" id="panel-hero"></section>
-        <section class="panel" id="panel-projects"></section>
-        <section class="panel" id="panel-skills"></section>
-        <section class="panel" id="panel-experience"></section>
-        <section class="panel" id="panel-education"></section>
-        <section class="panel" id="panel-certificates"></section>
-        <section class="panel" id="panel-services"></section>
-        <section class="panel" id="panel-testimonials"></section>
-        <section class="panel" id="panel-social"></section>
-        <section class="panel" id="panel-statistics"></section>
-        <section class="panel" id="panel-messages"></section>
-        <section class="panel" id="panel-emailsettings"></section>
-        <section class="panel" id="panel-sitesettings"></section>
-        <section class="panel" id="panel-menuitems"></section>
-        <section class="panel" id="panel-media"></section>
-        <section class="panel" id="panel-plugins"></section>
-        <section class="panel" id="panel-fileorganizer"></section>
-        <section class="panel" id="panel-swaggerdocs"></section>
-        <section class="panel" id="panel-duplicator"></section>
+                                <!-- Column 2: Next Steps -->
+                                <div class="welcome-panel-column">
+                                    <h3><i class="fa-solid fa-list-check"></i> Next Steps</h3>
+                                    <ul>
+                                        <li><a href="#projects"><i class="fa-solid fa-diagram-project"></i> Manage Featured Projects (<strong id="dash-quick-projects">0</strong>)</a></li>
+                                        <li><a href="#services"><i class="fa-solid fa-briefcase"></i> Update Capabilities &amp; Services (<strong id="dash-quick-services">0</strong>)</a></li>
+                                        <li><a href="#skills"><i class="fa-solid fa-bolt"></i> Refine Technology Stack (<strong id="dash-quick-skills">0</strong>)</a></li>
+                                        <li><a href="#messages"><i class="fa-solid fa-envelope"></i> Review Inquiries &amp; Messages (<strong id="dash-quick-messages">0</strong>)</a></li>
+                                    </ul>
+                                </div>
 
-    </div><!-- /.main-content -->
+                                <!-- Column 3: More Actions -->
+                                <div class="welcome-panel-column">
+                                    <h3><i class="fa-solid fa-gear"></i> Tools &amp; Maintenance</h3>
+                                    <ul>
+                                        <li><a href="#duplicator"><i class="fa-solid fa-clone" style="color:var(--accent);"></i> Duplicator Pro Backup &amp; Clone</a></li>
+                                        <li><a href="#media"><i class="fa-solid fa-photo-film"></i> Open Media Library</a></li>
+                                        <li><a href="#swaggerdocs"><i class="fa-solid fa-code"></i> REST API Documentation (Swagger)</a></li>
+                                        <li><a href="#emailsettings"><i class="fa-solid fa-envelope-circle-check"></i> Configure SMTP Email Delivery</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WordPress Dashboard Widgets Grid -->
+                    <div id="dashboard-widgets">
+                        <!-- Left Column -->
+                        <div class="postbox-container">
+                            <!-- Widget: At a Glance -->
+                            <div class="postbox">
+                                <div class="postbox-header">
+                                    <h2><i class="fa-solid fa-gauge"></i> At a Glance</h2>
+                                </div>
+                                <div class="inside">
+                                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                                        <div style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.2); border-radius:6px; padding:12px; display:flex; align-items:center; gap:10px;">
+                                            <i class="fa-solid fa-diagram-project" style="color:#E96B02; font-size:20px;"></i>
+                                            <div>
+                                                <div style="font-size:18px; font-weight:700; color:#FAF9F6;" id="dash-stat-projects">0</div>
+                                                <div style="font-size:11px; color:#A8A29E;">Projects</div>
+                                            </div>
+                                        </div>
+                                        <div style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.2); border-radius:6px; padding:12px; display:flex; align-items:center; gap:10px;">
+                                            <i class="fa-solid fa-bolt" style="color:#E96B02; font-size:20px;"></i>
+                                            <div>
+                                                <div style="font-size:18px; font-weight:700; color:#FAF9F6;" id="dash-stat-skills">0</div>
+                                                <div style="font-size:11px; color:#A8A29E;">Skills</div>
+                                            </div>
+                                        </div>
+                                        <div style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.2); border-radius:6px; padding:12px; display:flex; align-items:center; gap:10px;">
+                                            <i class="fa-solid fa-briefcase" style="color:#E96B02; font-size:20px;"></i>
+                                            <div>
+                                                <div style="font-size:18px; font-weight:700; color:#FAF9F6;" id="dash-stat-services">0</div>
+                                                <div style="font-size:11px; color:#A8A29E;">Services</div>
+                                            </div>
+                                        </div>
+                                        <div style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.2); border-radius:6px; padding:12px; display:flex; align-items:center; gap:10px;">
+                                            <i class="fa-solid fa-envelope" style="color:#E96B02; font-size:20px;"></i>
+                                            <div>
+                                                <div style="font-size:18px; font-weight:700; color:#FAF9F6;" id="dash-stat-messages">0</div>
+                                                <div style="font-size:11px; color:#A8A29E;">Messages</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="border-top:1px solid rgba(233,107,2,0.15); padding-top:10px; font-size:12px; color:#A8A29E;">
+                                        <i class="fa-solid fa-shield-halved" style="color:#E96B02;"></i> Portfolio CMS running on <strong>ASP.NET Core 8 &amp; SQLite</strong>. Primary Accent: <strong>#E96B02</strong>.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Widget: Activity / Recent Messages -->
+                            <div class="postbox">
+                                <div class="postbox-header">
+                                    <h2><i class="fa-solid fa-clock-rotate-left"></i> Activity &amp; Recent Inquiries</h2>
+                                </div>
+                                <div class="inside" id="dash-activity-inside">
+                                    <p style="color:#A8A29E; font-size:12px; margin-bottom:10px;">Recently received contact submissions:</p>
+                                    <div id="dash-recent-messages-list" style="display:flex; flex-direction:column; gap:8px;">
+                                        <div style="text-align:center; padding:12px; color:#78716C;">Loading recent activity...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="postbox-container">
+                            <!-- Widget: Quick Draft -->
+                            <div class="postbox">
+                                <div class="postbox-header">
+                                    <h2><i class="fa-solid fa-pen-to-square"></i> Quick Draft</h2>
+                                </div>
+                                <div class="inside">
+                                    <form class="quick-draft-form" id="quick-draft-form" onsubmit="event.preventDefault(); window.saveQuickDraft();">
+                                        <label for="quick-draft-title">Title</label>
+                                        <input type="text" id="quick-draft-title" placeholder="Project or article title..." required />
+                                        
+                                        <label for="quick-draft-content">What's on your mind?</label>
+                                        <textarea id="quick-draft-content" rows="3" placeholder="Brief description, tech stack, or outline..." required></textarea>
+                                        
+                                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                                            <button type="submit" class="button-primary" id="btn-save-draft">
+                                                <i class="fa-solid fa-floppy-disk"></i> Save Draft
+                                            </button>
+                                            <span id="quick-draft-status" style="font-size:12px; color:#E96B02; font-weight:600;"></span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Widget: WP Duplicator Pro Status -->
+                            <div class="postbox">
+                                <div class="postbox-header">
+                                    <h2><i class="fa-solid fa-clone" style="color:var(--accent);"></i> WP Duplicator Pro</h2>
+                                </div>
+                                <div class="inside">
+                                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                                        <div>
+                                            <div style="font-weight:700; color:#FAF9F6; font-size:14px;">Snapshot Engine Ready</div>
+                                            <div style="font-size:12px; color:#A8A29E;">Full database, assets &amp; upload packaging</div>
+                                        </div>
+                                        <span class="badge" style="background:rgba(233,107,2,0.2); border:1px solid #E96B02; color:#E96B02; font-weight:700;">ACTIVE</span>
+                                    </div>
+                                    <p style="font-size:12px; color:#A8A29E; margin-bottom:14px;">
+                                        Instantly export self-contained ZIP packages to duplicate or deploy this portfolio anywhere.
+                                    </p>
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="button-primary" onclick="window.switchAdminPanel('duplicator'); setTimeout(() => window.DuplicatorManager?.createPackage?.(), 200);">
+                                            <i class="fa-solid fa-box-archive"></i> Create Package Now
+                                        </button>
+                                        <button class="button" onclick="window.switchAdminPanel('duplicator');">
+                                            View Packages
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Widget: AI Site Architect Prompt -->
+                            <div class="postbox">
+                                <div class="postbox-header">
+                                    <h2><i class="fa-solid fa-wand-magic-sparkles"></i> AI Site Architect</h2>
+                                </div>
+                                <div class="inside">
+                                    <p style="font-size:12px; color:#A8A29E; margin-bottom:10px;">
+                                        Ask the integrated AI copilot to build features, add items, or optimize content:
+                                    </p>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="text" id="dash-ai-prompt" placeholder="e.g. Add a project for Next.js e-commerce store..." style="flex:1; background:#0F0E0C; border:1px solid rgba(233,107,2,0.25); border-radius:4px; padding:8px 10px; color:#FAF9F6; font-size:12px; outline:none;" onkeydown="if(event.key==='Enter'){event.preventDefault(); window.launchAiPrompt();}" />
+                                        <button class="button-primary" onclick="window.launchAiPrompt();">
+                                            <i class="fa-solid fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ── 2. DYNAMIC CMS PANELS ──────────────────────────────────────── -->
+                <section class="panel" id="panel-pages"></section>
+                <section class="panel" id="panel-hero"></section>
+                <section class="panel" id="panel-projects"></section>
+                <section class="panel" id="panel-skills"></section>
+                <section class="panel" id="panel-experience"></section>
+                <section class="panel" id="panel-education"></section>
+                <section class="panel" id="panel-certificates"></section>
+                <section class="panel" id="panel-services"></section>
+                <section class="panel" id="panel-testimonials"></section>
+                <section class="panel" id="panel-social"></section>
+                <section class="panel" id="panel-statistics"></section>
+                <section class="panel" id="panel-messages"></section>
+                <section class="panel" id="panel-emailsettings"></section>
+                <section class="panel" id="panel-sitesettings"></section>
+                <section class="panel" id="panel-menuitems"></section>
+                <section class="panel" id="panel-media"></section>
+                <section class="panel" id="panel-plugins"></section>
+                <section class="panel" id="panel-fileorganizer"></section>
+                <section class="panel" id="panel-swaggerdocs"></section>
+                <section class="panel" id="panel-duplicator"></section>
+
+            </div><!-- /#wpbody-content -->
+        </div><!-- /#wpbody -->
+    </div><!-- /#wpcontent -->
 
     <!-- Mobile Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -316,10 +680,15 @@
                 localStorage.setItem('admin_user', JSON.stringify({ email: 'test-admin@portfolio.com', role: 'admin' }));
             }
 
-            // Populate sidebar user email
+            // Populate topbar & profile user info
             const user = Auth.getUser();
             if (user?.email) {
-                document.getElementById('sidebar-user-email').textContent = user.email;
+                const username = user.email.split('@')[0];
+                const displayName = username.charAt(0).toUpperCase() + username.slice(1);
+                const nameEl = document.getElementById('topbar-user-name');
+                if (nameEl) nameEl.textContent = displayName;
+                const emailEl = document.getElementById('profile-user-email');
+                if (emailEl) emailEl.textContent = user.email;
             }
 
             // ─── Theme Toggle ─────────────────────────────────────────────────
@@ -327,14 +696,16 @@
                 document.documentElement.setAttribute('data-theme', theme);
                 localStorage.setItem('admin_theme', theme);
                 const isDark = theme === 'dark';
-                document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-                document.getElementById('theme-text').textContent = isDark ? 'Light' : 'Dark';
+                const icon = document.getElementById('theme-icon');
+                const text = document.getElementById('theme-text');
+                if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+                if (text) text.textContent = isDark ? 'Light' : 'Dark';
             };
 
             const savedTheme = localStorage.getItem('admin_theme') || 'dark';
             applyTheme(savedTheme);
 
-            document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+            document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
                 const current = document.documentElement.getAttribute('data-theme') || 'dark';
                 applyTheme(current === 'dark' ? 'light' : 'dark');
             });
@@ -344,18 +715,14 @@
                 const pluginsState = JSON.parse(localStorage.getItem('admin_plugins') || '{}');
                 const fileOrgNav = document.getElementById('nav-fileorganizer');
                 if (fileOrgNav) {
-                    fileOrgNav.style.display = pluginsState['fileorganizer'] === true ? 'flex' : 'none';
+                    fileOrgNav.parentElement.style.display = pluginsState['fileorganizer'] === true ? 'block' : 'none';
                 }
                 const swaggerNav = document.getElementById('nav-swaggerdocs');
                 if (swaggerNav) {
-                    swaggerNav.style.display = pluginsState['swaggerdocs'] === true ? 'flex' : 'none';
-                }
-                const dupNav = document.getElementById('nav-duplicator');
-                if (dupNav) {
-                    dupNav.style.display = 'flex';
+                    swaggerNav.parentElement.style.display = pluginsState['swaggerdocs'] === true ? 'block' : 'none';
                 }
             };
-            window.refreshPlugins(); // Call on load
+            window.refreshPlugins();
 
             // ─── Toast Notifications ──────────────────────────────────────────
             window.toast = (msg, type = 'success') => {
@@ -400,8 +767,8 @@
                 }
             };
 
-            document.getElementById('modal-close').addEventListener('click', window.closeModal);
-            overlay.addEventListener('click', e => { if (e.target === overlay) window.closeModal(); });
+            document.getElementById('modal-close')?.addEventListener('click', window.closeModal);
+            overlay?.addEventListener('click', e => { if (e.target === overlay) window.closeModal(); });
 
             // ─── Panel Error Display ──────────────────────────────────────────
             window.showPanelError = (panelId, errorMsg) => {
@@ -409,29 +776,7 @@
                 if (!panel) return;
                 panel.innerHTML = `
                     <div style="text-align:center;padding:3rem;color:var(--text-muted);">
-                        <main class="my-custom-face-container">
-                          <svg class="face" viewBox="0 0 320 380">
-                            <g fill="none" stroke="currentColor" stroke-linecap="round"
-                               stroke-linejoin="round" stroke-width="25">
-                              <g class="face__eyes" transform="translate(0,112.5)">
-                                <g transform="translate(15,0)">
-                                  <polyline class="face__eye-lid" points="37,0 0,120 75,120"></polyline>
-                                  <polyline class="face__pupil" points="55,120 55,155" stroke-dasharray="35 35"></polyline>
-                                </g>
-                                <g transform="translate(230,0)">
-                                  <polyline class="face__eye-lid" points="37,0 0,120 75,120"></polyline>
-                                  <polyline class="face__pupil" points="55,120 55,155" stroke-dasharray="35 35"></polyline>
-                                </g>
-                              </g>
-                              <rect class="face__nose" x="132.5" y="112.5" width="55" height="155" rx="4" ry="4"></rect>
-                              <g transform="translate(65,334)" stroke-dasharray="102 102">
-                                <path class="face__mouth-left" d="M 0 30 C 0 30 40 0 95 0"></path>
-                                <path class="face__mouth-right" d="M 95 0 C 150 0 190 30 190 30"></path>
-                              </g>
-                            </g>
-                          </svg>
-                        </main>
-                        <h3 style="margin-top:1.5rem;color:var(--text-primary);">Failed to Load Panel</h3>
+                        <h3 style="margin-top:1.5rem;color:var(--text-primary);"><i class="fa-solid fa-triangle-exclamation" style="color:#E96B02;"></i> Failed to Load Section</h3>
                         <p style="margin-top:0.5rem;font-size:0.9rem;opacity:0.8;">${errorMsg || 'An unexpected error occurred.'}</p>
                     </div>`;
             };
@@ -535,87 +880,43 @@
             };
 
             // ─── Navigation / Panel Switching ─────────────────────────────────
-            const sidebar = document.getElementById('sidebar');
-            const appParent = document.getElementById('nav-item-appearance');
-            const appSubmenu = document.getElementById('nav-submenu-appearance');
-            const plugParent = document.getElementById('nav-item-plugins');
-            const plugSubmenu = document.getElementById('nav-submenu-plugins');
-
-            // Panels associated with Pages content
-            const CONTENT_PANELS = new Set([
-                'pages', 'hero', 'projects', 'skills', 'experience', 'education',
-                'certificates', 'services', 'testimonials', 'social', 'statistics'
-            ]);
-
             const switchPanel = (panelId) => {
                 if (!panelId) return;
                 
-                // Persist current panel to URL hash for hard refreshes
+                // Persist current panel to URL hash
                 if (window.location.hash !== '#' + panelId) {
                     window.history.pushState(null, '', '#' + panelId);
                 }
 
-                const isContent = CONTENT_PANELS.has(panelId);
-                const isAppearance = (panelId === 'menuitems');
                 const isPlugins = panelId.startsWith('plugins');
 
-                // Update top-level nav-item active states
-                document.querySelectorAll('.nav-item').forEach(n => {
-                    if (n.dataset.panel === 'pages') {
-                        n.classList.toggle('active', isContent);
-                    } else if (n.dataset.panel === 'appearance') {
-                        n.classList.toggle('active', isAppearance);
-                    } else if (n.dataset.panel === 'plugins-installed') {
-                        n.classList.toggle('active', isPlugins);
-                    } else {
-                        n.classList.toggle('active', n.dataset.panel === panelId);
-                    }
+                // Update WordPress sidebar menu states
+                document.querySelectorAll('#adminmenu li.menu-top').forEach(li => {
+                    const topPanel = li.dataset.panel;
+                    const hasSubitem = !!li.querySelector(`a[data-panel="${panelId}"]`);
+                    const isDirectMatch = (topPanel === panelId) || (topPanel === 'plugins-installed' && isPlugins);
+                    const shouldBeActive = isDirectMatch || hasSubitem;
+
+                    li.classList.toggle('current', shouldBeActive);
+                    li.classList.toggle('active', shouldBeActive);
+                    li.classList.toggle('wp-has-current-submenu', shouldBeActive);
                 });
 
-                // Update submenu-item active states
-                document.querySelectorAll('.nav-subitem').forEach(s => {
-                    s.classList.toggle('active', s.dataset.panel === panelId);
+                // Update submenu active anchors
+                document.querySelectorAll('#adminmenu .wp-submenu li').forEach(subLi => {
+                    const subLink = subLi.querySelector('a');
+                    const isSubMatch = subLink?.dataset?.panel === panelId;
+                    subLi.classList.toggle('current', isSubMatch);
                 });
 
-                // Expand / collapse Appearance submenu
-                if (isAppearance) {
-                    appSubmenu?.classList.add('open');
-                    appParent?.classList.add('open');
-                } else {
-                    appSubmenu?.classList.remove('open');
-                    appParent?.classList.remove('open');
-                }
-
-                // Expand / collapse Plugins submenu
-                if (isPlugins) {
-                    plugSubmenu?.classList.add('open');
-                    plugParent?.classList.add('open');
-                } else {
-                    plugSubmenu?.classList.remove('open');
-                    plugParent?.classList.remove('open');
-                }
-
-                // Activate the correct panel
+                // Activate the correct panel container
                 document.querySelectorAll('.panel').forEach(p => {
                     const targetId = isPlugins ? 'plugins' : panelId;
                     p.classList.toggle('active', p.id === `panel-${targetId}`);
                 });
 
-                // Update topbar title
-                const labelEl = document.querySelector(
-                    `.nav-subitem[data-panel="${panelId}"], .nav-item[data-panel="${panelId}"]`
-                );
-                if (panelId === 'emailsettings') {
-                    document.getElementById('topbar-title').textContent = 'Email Sending & Receiving Configuration';
-                } else if (labelEl) {
-                    document.getElementById('topbar-title').textContent = labelEl.textContent.trim();
-                } else if (isContent) {
-                    document.getElementById('topbar-title').textContent = 'Pages';
-                }
-
-                // Close mobile sidebar
-                sidebar?.classList.remove('open');
-                document.getElementById('sidebar-overlay')?.classList.remove('open');
+                // Scroll to top of content
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
                 // Load panel content
                 loadPanel(panelId);
@@ -624,78 +925,157 @@
             // Expose globally
             window.switchAdminPanel = switchPanel;
 
-            // Appearance parent accordion toggle
-            appParent?.addEventListener('click', () => {
-                const isOpen = appSubmenu?.classList.contains('open');
-                if (isOpen) {
-                    appSubmenu.classList.remove('open');
-                    appParent.classList.remove('open');
-                } else {
-                    appSubmenu?.classList.add('open');
-                    appParent?.classList.add('open');
-                    switchPanel('menuitems');
-                }
-            });
-
-            // Plugins parent accordion toggle
-            plugParent?.addEventListener('click', () => {
-                const isOpen = plugSubmenu?.classList.contains('open');
-                if (isOpen) {
-                    plugSubmenu.classList.remove('open');
-                    plugParent.classList.remove('open');
-                } else {
-                    plugSubmenu?.classList.add('open');
-                    plugParent?.classList.add('open');
-                    switchPanel('plugins-installed');
-                }
-            });
-
-            // Nav item click bindings (top level)
-            document.querySelectorAll('.nav-item:not(.nav-item-parent)').forEach(item => {
-                item.addEventListener('click', () => switchPanel(item.dataset.panel));
-            });
-
-            // Submenu items
-            document.querySelectorAll('.nav-subitem').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    switchPanel(item.dataset.panel);
+            // Bind click handlers to menu links
+            document.querySelectorAll('#adminmenu a[data-panel]').forEach(anchor => {
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchPanel(anchor.dataset.panel);
                 });
             });
 
-            // ─── Mobile Sidebar Toggle ─────────────────────────────────────────
-            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            // ─── WordPress Menu Collapse/Fold Toggle ───────────────────────────
+            const collapseBtn = document.getElementById('collapse-button');
+            const collapseIcon = document.getElementById('collapse-icon');
+            const savedFolded = localStorage.getItem('admin_sidebar_folded') === 'true';
 
-            document.getElementById('mobile-sidebar-toggle').addEventListener('click', () => {
-                sidebar.classList.toggle('open');
-                sidebarOverlay.classList.toggle('open');
+            if (savedFolded) {
+                document.body.classList.add('folded');
+                collapseIcon?.classList.replace('fa-chevron-left', 'fa-chevron-right');
+            }
+
+            collapseBtn?.addEventListener('click', () => {
+                const isFolded = document.body.classList.toggle('folded');
+                localStorage.setItem('admin_sidebar_folded', isFolded);
+                if (isFolded) {
+                    collapseIcon?.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                } else {
+                    collapseIcon?.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                }
             });
 
-            sidebarOverlay.addEventListener('click', () => {
-                sidebar.classList.remove('open');
-                sidebarOverlay.classList.remove('open');
-            });
+            // ─── Quick Draft Handler ──────────────────────────────────────────
+            window.saveQuickDraft = async () => {
+                const title = document.getElementById('quick-draft-title')?.value.trim();
+                const content = document.getElementById('quick-draft-content')?.value.trim();
+                const statusEl = document.getElementById('quick-draft-status');
+                const saveBtn = document.getElementById('btn-save-draft');
+                if (!title || !content) return;
 
-            // ─── Logout ────────────────────────────────────────────────────────
-            document.getElementById('logout-btn').addEventListener('click', async () => {
+                try {
+                    if (saveBtn) saveBtn.disabled = true;
+                    if (statusEl) statusEl.textContent = 'Saving draft...';
+
+                    const res = await ProjectsAPI.create({
+                        title,
+                        description: content,
+                        category: 'Draft',
+                        tags: 'Draft, WordPress',
+                        isFeatured: false,
+                        liveUrl: '',
+                        githubUrl: ''
+                    });
+
+                    if (res?.success || res?.data) {
+                        window.toast('Draft project created successfully!', 'success');
+                        document.getElementById('quick-draft-form')?.reset();
+                        if (statusEl) {
+                            statusEl.textContent = 'Draft saved!';
+                            setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                        }
+                        refreshDashboardStats();
+                    } else {
+                        throw new Error(res?.message || 'Failed to save draft');
+                    }
+                } catch (err) {
+                    window.toast(err.message || 'Failed to save draft', 'error');
+                    if (statusEl) statusEl.textContent = 'Error';
+                } finally {
+                    if (saveBtn) saveBtn.disabled = false;
+                }
+            };
+
+            // ─── AI Site Architect Direct Launch ──────────────────────────────
+            window.launchAiPrompt = () => {
+                const promptInput = document.getElementById('dash-ai-prompt');
+                const query = promptInput?.value.trim();
+                if (!query) return;
+
+                window.AiCopilotManager?.toggle(true);
+                const copilotInput = document.getElementById('ai-copilot-input');
+                if (copilotInput) {
+                    copilotInput.value = query;
+                    document.getElementById('ai-copilot-send')?.click();
+                }
+                promptInput.value = '';
+            };
+
+            // ─── Logout Handlers ──────────────────────────────────────────────
+            const handleLogout = async () => {
                 try { await AuthAPI.logout(); } catch { /* swallow */ }
                 Auth.clear();
                 window.location.href = './login.html';
-            });
+            };
+            document.getElementById('topbar-logout-btn')?.addEventListener('click', handleLogout);
+            document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
 
-            // ─── Overview Stats (fetched in parallel) ─────────────────────────
-            (async () => {
+            // ─── Overview Stats & Activity (fetched in parallel) ───────────────
+            const refreshDashboardStats = async () => {
                 try {
-                    const [projects, skills, messages] = await Promise.all([
+                    const [projects, skills, services, messages] = await Promise.all([
                         ProjectsAPI.getAll(),
                         SkillsAPI.getAll(),
+                        ServicesAPI.getAll(),
                         ContactAPI.getAll()
                     ]);
-                    document.getElementById('dash-stat-projects').textContent  = projects?.data?.length  ?? 0;
-                    document.getElementById('dash-stat-skills').textContent    = skills?.data?.length    ?? 0;
-                    document.getElementById('dash-stat-messages').textContent  = messages?.data?.length  ?? 0;
-                } catch { /* silently fail — non-critical */ }
-            })();
+                    const projCount = projects?.data?.length ?? 0;
+                    const skillCount = skills?.data?.length ?? 0;
+                    const servCount = services?.data?.length ?? 0;
+                    const msgCount = messages?.data?.length ?? 0;
+
+                    const setVal = (id, val) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = val;
+                    };
+
+                    setVal('dash-stat-projects', projCount);
+                    setVal('dash-stat-skills', skillCount);
+                    setVal('dash-stat-services', servCount);
+                    setVal('dash-stat-messages', msgCount);
+
+                    setVal('dash-quick-projects', projCount);
+                    setVal('dash-quick-skills', skillCount);
+                    setVal('dash-quick-services', servCount);
+                    setVal('dash-quick-messages', msgCount);
+
+                    setVal('topbar-unread-badge', msgCount);
+                    setVal('sidebar-unread-count', msgCount);
+
+                    const sideBadge = document.getElementById('sidebar-unread-badge');
+                    if (sideBadge) sideBadge.className = msgCount > 0 ? 'update-plugins' : 'update-plugins count-0';
+
+                    // Recent Messages Activity widget
+                    const msgList = document.getElementById('dash-recent-messages-list');
+                    if (msgList && messages?.data) {
+                        const recents = messages.data.slice(0, 4);
+                        if (recents.length === 0) {
+                            msgList.innerHTML = '<div style="color:#78716C; font-size:12px; padding:6px 0;">No inquiries received yet.</div>';
+                        } else {
+                            msgList.innerHTML = recents.map(m => `
+                                <div style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.18); border-radius:6px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <div style="font-weight:600; color:#FAF9F6; font-size:12px;">${m.name || 'Visitor'} <span style="color:#A8A29E; font-weight:normal; font-size:11px;">(${m.email || ''})</span></div>
+                                        <div style="color:#A8A29E; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:260px;">${m.subject || m.message || 'No subject'}</div>
+                                    </div>
+                                    <button class="button button-small" onclick="window.switchAdminPanel('messages');" style="font-size:11px;">View</button>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Dashboard stats refresh error:', e);
+                }
+            };
+            refreshDashboardStats();
             
             // ─── Initialize AI Co-Pilot & Command Palette ──────────────────────
             window.AiCopilotManager?.init();
@@ -706,6 +1086,8 @@
                 const hash = window.location.hash.replace('#', '');
                 if (hash) {
                     switchPanel(hash);
+                } else {
+                    switchPanel('overview');
                 }
             };
             

@@ -3,225 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login — Portfolio CMS</title>
+    <title>Log In &lsaquo; Portfolio CMS &#8212; WordPress</title>
     
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Design System Tokens -->
     <link rel="stylesheet" href="../../assets/css/variables.css">
-    <link rel="stylesheet" href="../../assets/css/styles.css">
 
     <style>
-        body {
+        :root {
+            --wp-login-bg: #0F0E0C;
+            --wp-card-bg: #171512;
+            --wp-border: rgba(233, 107, 2, 0.25);
+            --wp-accent: #E96B02;
+            --wp-text: #FAF9F6;
+            --wp-text-muted: #A8A29E;
+        }
+
+        body.login {
+            background: var(--wp-login-bg);
+            color: var(--wp-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-size: 13px;
+            line-height: 1.4em;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: var(--bg-primary);
-            padding: 1.5rem;
+            margin: 0;
+            padding: 20px;
             position: relative;
             overflow-x: hidden;
-        }
-
-        .bg-canvas {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            background: 
-                radial-gradient(circle at 15% 20%, hsla(250, 95%, 68%, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 85% 80%, hsla(280, 85%, 60%, 0.1) 0%, transparent 45%);
-        }
-
-        .login-card {
-            width: min(440px, calc(100vw - 2rem));
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 2.25rem 2rem;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(16px);
-            position: relative;
-            z-index: 10;
-            margin: auto;
             box-sizing: border-box;
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
+        /* Ambient Glow Accent Backdrop */
+        .login-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 50% 20%, rgba(233, 107, 2, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 20% 80%, rgba(233, 107, 2, 0.04) 0%, transparent 50%);
+            z-index: 0;
         }
-        .login-logo-wrap {
-            width: 56px;
-            height: 56px;
+
+        #login {
+            width: 320px;
+            max-width: 95vw;
+            margin: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* WordPress Circular Logo */
+        #login h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        #login h1 a {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--wp-text);
+            outline: none;
+            transition: transform 0.2s ease;
+        }
+
+        #login h1 a:hover {
+            transform: scale(1.05);
+        }
+
+        .wp-logo-circle {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            background: #171512;
+            border: 2px solid var(--wp-accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.25rem;
+            box-shadow: 0 0 25px rgba(233, 107, 2, 0.35);
+            margin-bottom: 12px;
+            color: var(--wp-accent);
+            font-size: 38px;
+        }
+
+        .wp-site-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--wp-text);
+            letter-spacing: 0.02em;
+        }
+
+        .wp-site-sub {
+            font-size: 11px;
+            color: var(--wp-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Authentic WordPress Error / Notice Box */
+        .notice-error {
+            background: #1e1512;
+            border-left: 4px solid #ef4444;
+            border-top: 1px solid rgba(239, 68, 68, 0.2);
+            border-right: 1px solid rgba(239, 68, 68, 0.2);
+            border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #fca5a5;
+            font-size: 13px;
+            line-height: 1.4;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        /* WordPress Login Form Card */
+        #loginform {
+            background: var(--wp-card-bg);
+            border: 1px solid var(--wp-border);
+            border-radius: 8px;
+            padding: 26px 24px 26px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        #loginform p {
+            margin: 0 0 16px 0;
+        }
+
+        #loginform label {
+            display: block;
+            color: var(--wp-text);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        #loginform .input {
+            width: 100%;
+            height: 38px;
+            padding: 0 12px;
+            background: #0F0E0C;
+            border: 1px solid var(--wp-border);
+            border-radius: 4px;
+            color: var(--wp-text);
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        #loginform .input:focus {
+            border-color: var(--wp-accent);
+            box-shadow: 0 0 8px rgba(233, 107, 2, 0.4);
+        }
+
+        .password-wrap {
             position: relative;
         }
 
-        @keyframes square-animation {
-         0% { left: 0; top: 0; }
-         10.5% { left: 0; top: 0; }
-         12.5% { left: 32px; top: 0; }
-         23% { left: 32px; top: 0; }
-         25% { left: 64px; top: 0; }
-         35.5% { left: 64px; top: 0; }
-         37.5% { left: 64px; top: 32px; }
-         48% { left: 64px; top: 32px; }
-         50% { left: 32px; top: 32px; }
-         60.5% { left: 32px; top: 32px; }
-         62.5% { left: 32px; top: 64px; }
-         73% { left: 32px; top: 64px; }
-         75% { left: 0; top: 64px; }
-         85.5% { left: 0; top: 64px; }
-         87.5% { left: 0; top: 32px; }
-         98% { left: 0; top: 32px; }
-         100% { left: 0; top: 0; }
-        }
-
-        .loader {
-         position: relative;
-         width: 96px;
-         height: 96px;
-         transform: scale(0.42) rotate(45deg);
-         transform-origin: center center;
-        }
-
-        .loader-square {
-         position: absolute;
-         top: 0;
-         left: 0;
-         width: 28px;
-         height: 28px;
-         margin: 2px;
-         border-radius: 4px;
-         background: linear-gradient(135deg, var(--accent, #6366f1), hsl(280, 85%, 65%));
-         box-shadow: 0 0 10px hsla(250, 95%, 68%, 0.4);
-         animation: square-animation 10s ease-in-out infinite both;
-        }
-
-        .loader-square:nth-of-type(0) { animation-delay: 0s; }
-        .loader-square:nth-of-type(1) { animation-delay: -1.4285714286s; }
-        .loader-square:nth-of-type(2) { animation-delay: -2.8571428571s; }
-        .loader-square:nth-of-type(3) { animation-delay: -4.2857142857s; }
-        .loader-square:nth-of-type(4) { animation-delay: -5.7142857143s; }
-        .loader-square:nth-of-type(5) { animation-delay: -7.1428571429s; }
-        .loader-square:nth-of-type(6) { animation-delay: -8.5714285714s; }
-        .loader-square:nth-of-type(7) { animation-delay: -10s; }
-        .login-title {
-            font-family: var(--font-heading);
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        .login-sub {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .form-group { margin-bottom: 1.25rem; }
-        .form-label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 0.4rem;
-        }
-        .form-input {
-            width: 100%;
-            padding: 0.7rem 0.9rem;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            transition: border-color var(--transition-fast);
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 0.75rem;
-            background: linear-gradient(135deg, var(--accent), hsl(280, 85%, 60%));
-            color: #fff;
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
             border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            font-weight: 600;
+            color: var(--wp-text-muted);
             cursor: pointer;
-            transition: opacity var(--transition-fast);
-            margin-top: 0.5rem;
-        }
-        .btn-login:hover { opacity: 0.92; }
-
-        .error-alert {
-            background: hsla(0, 70%, 50%, 0.1);
-            border: 1px solid hsla(0, 70%, 50%, 0.3);
-            color: hsl(0, 70%, 65%);
-            padding: 0.65rem 0.9rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            margin-bottom: 1.25rem;
-            display: none;
+            padding: 4px;
+            font-size: 13px;
         }
 
-        .back-link {
-            display: block;
+        .password-toggle:hover {
+            color: var(--wp-accent);
+        }
+
+        /* Forgetmenot / Remember Me */
+        .forgetmenot {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--wp-text-muted);
+            float: left;
+            margin-top: 6px;
+        }
+
+        .forgetmenot input[type="checkbox"] {
+            accent-color: var(--wp-accent);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* WordPress Primary Submit Button */
+        .submit {
+            text-align: right;
+            margin: 0;
+            overflow: hidden;
+            padding-top: 4px;
+        }
+
+        .button-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 38px;
+            padding: 0 20px;
+            background: var(--wp-accent) !important;
+            border: 1px solid var(--wp-accent) !important;
+            color: #0F0E0C !important;
+            font-weight: 700 !important;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(233, 107, 2, 0.3);
+        }
+
+        .button-primary:hover {
+            background: #FF8A24 !important;
+            border-color: #FF8A24 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(233, 107, 2, 0.45);
+        }
+
+        .button-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Under-card Links */
+        #nav,
+        #backtoblog {
+            padding: 0 4px;
+            margin-top: 18px;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        #nav a,
+        #backtoblog a {
+            color: var(--wp-text-muted);
+            text-decoration: none;
+            transition: color 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #nav a:hover,
+        #backtoblog a:hover {
+            color: var(--wp-accent);
+        }
+
+        .login-privacy-policy {
             text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.8rem;
-            color: var(--text-muted);
+            margin-top: 24px;
+            font-size: 11px;
+            color: #78716C;
+        }
+
+        .login-privacy-policy a {
+            color: #78716C;
             text-decoration: none;
         }
-        .back-link:hover { color: var(--text-primary); }
+
+        .login-privacy-policy a:hover {
+            color: var(--wp-accent);
+        }
     </style>
 </head>
-<body>
-    <div class="bg-canvas"></div>
+<body class="login">
 
-    <div class="login-card">
-        <div class="login-header">
-            <div class="login-logo-wrap">
-                <div class="loader">
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
-                    <div class="loader-square"></div>
+    <div class="login-backdrop"></div>
+
+    <div id="login">
+        <!-- Logo -->
+        <h1>
+            <a href="../../index.html" title="Portfolio CMS &amp; WordPress Duplicator">
+                <div class="wp-logo-circle">
+                    <i class="fa-brands fa-wordpress"></i>
                 </div>
-            </div>
-            <h1 class="login-title">Admin Sign In</h1>
-            <p class="login-sub">Enter credentials to access Portfolio CMS</p>
-        </div>
+                <div class="wp-site-title">Portfolio CMS</div>
+                <div class="wp-site-sub">Admin Access</div>
+            </a>
+        </h1>
 
-        <div class="error-alert" id="error-alert"></div>
+        <!-- Error Alert -->
+        <div class="notice-error" id="login_error" role="alert"></div>
 
-        <form id="login-form">
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <input class="form-input" type="email" id="email" value="admin@portfolio.com" required placeholder="admin@portfolio.com">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input class="form-input" type="password" id="password" value="Admin@123" required placeholder="••••••••">
-            </div>
-            <button class="btn-login" type="submit" id="btn-submit">Sign In</button>
+        <!-- Form Card -->
+        <form name="loginform" id="loginform" method="post" autocomplete="on">
+            <p>
+                <label for="user_login">Username or Email Address</label>
+                <input type="text" name="log" id="user_login" class="input" value="admin@portfolio.com" size="20" autocapitalize="off" autocomplete="username" required>
+            </p>
+
+            <p>
+                <label for="user_pass">Password</label>
+                <div class="password-wrap">
+                    <input type="password" name="pwd" id="user_pass" class="input password-input" value="Admin@123" size="20" autocomplete="current-password" spellcheck="false" required>
+                    <button type="button" class="password-toggle" id="toggle-pwd-btn" aria-label="Show password">
+                        <i class="fa-regular fa-eye" id="toggle-pwd-icon"></i>
+                    </button>
+                </div>
+            </p>
+
+            <p class="forgetmenot">
+                <input name="rememberme" type="checkbox" id="rememberme" value="forever" checked>
+                <label for="rememberme" style="display:inline; margin:0; cursor:pointer;">Remember Me</label>
+            </p>
+
+            <p class="submit">
+                <button type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large">
+                    <i class="fa-solid fa-right-to-bracket"></i> Log In
+                </button>
+            </p>
         </form>
 
-        <a href="../../public/pages/index.html" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i> Back to Public Portfolio
-        </a>
+        <p id="nav">
+            <a href="javascript:void(0)" onclick="alert('Demo Admin Credentials:\nEmail: admin@portfolio.com\nPassword: Admin@123');">Lost your password?</a>
+        </p>
+
+        <p id="backtoblog">
+            <a href="../../index.html">
+                <i class="fa-solid fa-arrow-left"></i> &larr; Go to Portfolio
+            </a>
+        </p>
+
+        <div class="login-privacy-policy">
+            <span>Powered by Portfolio CMS &bull; Primary Accent: <strong style="color:var(--wp-accent);">#E96B02</strong></span>
+        </div>
     </div>
 
+    <!-- API Client -->
     <script src="../../utils/api.js"></script>
     <script>
         (() => {
@@ -232,36 +370,46 @@
                 return;
             }
 
-            const form      = document.getElementById('login-form');
-            const alert     = document.getElementById('error-alert');
-            const submitBtn = document.getElementById('btn-submit');
+            const form        = document.getElementById('loginform');
+            const errorBox    = document.getElementById('login_error');
+            const submitBtn   = document.getElementById('wp-submit');
+            const pwdInput    = document.getElementById('user_pass');
+            const togglePwd   = document.getElementById('toggle-pwd-btn');
+            const toggleIcon  = document.getElementById('toggle-pwd-icon');
+
+            // Password reveal toggle
+            togglePwd?.addEventListener('click', () => {
+                const isPwd = pwdInput.type === 'password';
+                pwdInput.type = isPwd ? 'text' : 'password';
+                toggleIcon.className = isPwd ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+            });
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                alert.style.display = 'none';
+                errorBox.style.display = 'none';
 
-                const email    = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
+                const email    = document.getElementById('user_login').value.trim();
+                const password = pwdInput.value;
 
-                submitBtn.disabled    = true;
-                submitBtn.textContent = 'Signing in…';
+                submitBtn.disabled  = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in…';
 
                 try {
-                    const res  = await AuthAPI.login({ email, password });
+                    const res = await AuthAPI.login({ email, password });
                     const data = res?.data;
                     const token = data?.accessToken || data?.token;
                     if (token) {
                         Auth.setSession(token, { email: data.email, fullName: data.fullName, role: data.role || 'Admin' });
                         window.location.href = './dashboard.html';
                     } else {
-                        throw new Error('Invalid response payload');
+                        throw new Error('Invalid authentication response');
                     }
                 } catch (err) {
-                    alert.textContent   = err.message || 'Login failed. Please check your credentials.';
-                    alert.style.display = 'block';
+                    errorBox.innerHTML = `<strong>Error:</strong> ${err.message || 'The username or password you entered is incorrect.'}`;
+                    errorBox.style.display = 'block';
                 } finally {
-                    submitBtn.disabled    = false;
-                    submitBtn.textContent = 'Sign In';
+                    submitBtn.disabled  = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Log In';
                 }
             });
         })();

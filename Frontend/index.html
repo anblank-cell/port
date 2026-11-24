@@ -120,14 +120,44 @@
         <!-- Hero Section (data loaded from API) -->
         <section class="hero-section" id="hero">
             <div class="container hero-content">
-                <span class="badge" id="hero-badge">Available for Work</span>
+                <div class="hero-badge-pulse" id="hero-badge">
+                    <span class="pulse-beacon"></span>
+                    <span id="hero-badge-text">Available for New Projects</span>
+                </div>
                 <h1 class="hero-title text-glow-gradient" id="hero-heading">Crafting Exceptional Digital Experiences</h1>
                 <p class="hero-subtitle" id="hero-subtext">
                     Full stack developer building production-grade applications with clean architecture, premium UX, and enterprise security.
                 </p>
                 <div class="hero-actions" id="hero-call-to-actions">
-                    <a href="#projects" class="btn btn-primary" id="view-work-cta">Explore Work</a>
-                    <a href="#contact" class="btn btn-secondary" id="contact-cta">Get In Touch</a>
+                    <a href="#projects" class="btn btn-primary" id="view-work-cta" style="background:#E96B02; color:#0F0E0C; font-weight:700;">
+                        <i class="fa-solid fa-arrow-down" style="margin-right:8px;"></i> Explore Work
+                    </a>
+                    <a href="#contact" class="btn btn-secondary" id="contact-cta">
+                        <i class="fa-regular fa-envelope" style="margin-right:8px;"></i> Get In Touch
+                    </a>
+                </div>
+
+                <!-- Hero Quick Stats Ribbon -->
+                <div class="hero-stats-ribbon" id="hero-stats-ribbon">
+                    <div class="stat-item">
+                        <span class="stat-number" id="hero-stat-projects">25+</span>
+                        <span class="stat-label">Projects Delivered</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="hero-stat-uptime">99.9%</span>
+                        <span class="stat-label">Architecture Quality</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="hero-stat-satisfaction">100%</span>
+                        <span class="stat-label">Client Satisfaction</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="hero-stat-engine" style="font-size:1.4rem; color:#E96B02;">PRO</span>
+                        <span class="stat-label">WP Duplicator &amp; AI</span>
+                    </div>
                 </div>
             </div>
         </section>

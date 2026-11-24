@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gsap.ticker.lagSmoothing(0);
     };
 
-    // 2. Initialize Interactive Card Hover Spotlight effect
+    // 2. Initialize Interactive Card Hover Spotlight effect & 3D Magnetic Tilt
     const initSpotlightCards = () => {
         const cards = document.querySelectorAll(".premium-card");
         
@@ -39,6 +39,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 card.style.setProperty("--x", `${x}px`);
                 card.style.setProperty("--y", `${y}px`);
+
+                // 3D Magnetic Tilt Micro-Interaction
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const tiltX = Math.max(-8, Math.min(8, ((y - centerY) / centerY) * -7));
+                const tiltY = Math.max(-8, Math.min(8, ((x - centerX) / centerX) * 7));
+                card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-5px)`;
+            });
+
+            card.addEventListener("mouseleave", () => {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
             });
         });
     };
@@ -79,18 +90,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // 4. Initial GSAP Visual Entrances
+    // 4. Initial GSAP Visual Entrances & Staggers
     const initEntrances = () => {
         // Register GSAP ScrollTrigger plugin
         gsap.registerPlugin(ScrollTrigger);
 
         // Header and navbar load animation
         gsap.from(".navbar-container", {
-            y: -20,
+            y: -25,
             opacity: 0,
-            duration: 1,
+            duration: 1.1,
             ease: "power4.out"
         });
+
+        // Hero Content Stagger
+        const heroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+        heroTimeline
+            .from("#hero-badge", { y: -20, opacity: 0, duration: 0.8, delay: 0.2 })
+            .from("#hero-heading", { y: 30, opacity: 0, duration: 1 }, "-=0.5")
+            .from("#hero-subtext", { y: 25, opacity: 0, duration: 0.9 }, "-=0.6")
+            .from("#hero-call-to-actions", { y: 20, opacity: 0, duration: 0.8 }, "-=0.5")
+            .from("#hero-stats-ribbon", { y: 30, opacity: 0, duration: 0.9, scale: 0.96 }, "-=0.4");
 
         // General section headers fade-in-up triggering on scroll
         const sectionHeaders = document.querySelectorAll(".section-header");
@@ -101,12 +121,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     start: "top 85%",
                     toggleActions: "play none none none"
                 },
-                y: 30,
+                y: 35,
                 opacity: 0,
                 duration: 1,
                 ease: "power3.out"
             });
         });
+    };
+
+    // 5. Update live hero stats from API if available
+    const initLiveStats = async () => {
+        try {
+            if (window.API?.ProjectsAPI) {
+                const res = await window.API.ProjectsAPI.getAll();
+                const count = res?.data?.length;
+                if (count && count > 0) {
+                    const el = document.getElementById('hero-stat-projects');
+                    if (el) el.textContent = `${count}+`;
+                }
+            }
+        } catch { /* non-critical */ }
     };
 
     // Expose spotlight init globally so portfolio.js can re-run it after injecting dynamic content
@@ -117,4 +151,5 @@ document.addEventListener("DOMContentLoaded", () => {
     initSpotlightCards();
     initMobileMenu();
     initEntrances();
+    initLiveStats();
 });

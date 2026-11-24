@@ -453,3 +453,154 @@ a {
 .footer-links a:hover {
     color: var(--text-primary);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PREMIUM MICRO-ANIMATIONS & INTERACTIVE ACCENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Hero Pulse Beacon */
+.hero-badge-pulse {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(233, 107, 2, 0.12) !important;
+    border: 1px solid rgba(233, 107, 2, 0.38) !important;
+    color: #E96B02 !important;
+    padding: 7px 16px !important;
+    border-radius: 9999px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 0 25px rgba(233, 107, 2, 0.22);
+    margin-bottom: var(--spacing-sm);
+}
+
+.pulse-beacon {
+    width: 8px;
+    height: 8px;
+    background: #E96B02;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+    box-shadow: 0 0 8px #E96B02;
+}
+
+.pulse-beacon::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    border: 2px solid #E96B02;
+    animation: beaconRipple 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+@keyframes beaconRipple {
+    0% { transform: scale(0.6); opacity: 1; }
+    100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Hero Stats Ribbon */
+.hero-stats-ribbon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 2.75rem;
+    padding: 1.25rem 2.25rem;
+    background: rgba(23, 21, 18, 0.85);
+    border: 1px solid rgba(233, 107, 2, 0.22);
+    border-radius: var(--radius-md);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    max-width: 860px;
+    width: 100%;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-number {
+    font-family: var(--font-heading);
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #FAF9F6;
+    background: linear-gradient(135deg, #FAF9F6 45%, #E96B02 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 38px;
+    background: rgba(233, 107, 2, 0.2);
+}
+
+@media (max-width: 680px) {
+    .hero-stats-ribbon {
+        gap: 1.25rem;
+        padding: 1rem;
+    }
+    .stat-divider {
+        display: none;
+    }
+}
+
+/* 3D Magnetic Tilt Container */
+.card-grid {
+    perspective: 1000px;
+}
+
+.premium-card {
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.premium-card:hover {
+    border-color: rgba(233, 107, 2, 0.45);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(233, 107, 2, 0.16);
+}
+
+/* Smooth Focus Glow for Form Controls */
+input:focus, textarea:focus, select:focus {
+    border-color: #E96B02 !important;
+    box-shadow: 0 0 12px rgba(233, 107, 2, 0.35) !important;
+}
+
+/* Skill Progress Bars */
+.skill-bar-wrap {
+    margin-top: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 9999px;
+    height: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.skill-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #E96B02, #FF8A24);
+    border-radius: 9999px;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 10px rgba(233, 107, 2, 0.6);
+}
