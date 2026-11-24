@@ -5,7 +5,11 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = '/api/ai';
+    const getApiUrl = () => {
+        if (window.API_BASE && window.API_BASE.startsWith('http')) return `${window.API_BASE}/ai/chat`;
+        if (window.location.port !== '5100') return 'http://localhost:5100/api/ai/chat';
+        return '/api/ai/chat';
+    };
 
     // Inject Floating AI widget into public page
     const widget = document.createElement('div');
@@ -91,11 +95,17 @@ document.addEventListener('DOMContentLoaded', () => {
         msgs.scrollTop = msgs.scrollHeight;
 
         try {
-            const res = await fetch(`${API_BASE}/chat`, {
+            const res = await fetch(getApiUrl(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: q, isAdmin: false })
             });
+
+            if (!res.ok) {
+                const textErr = await res.text();
+                throw new Error(`HTTP ${res.status}: ${textErr.substring(0, 80)}`);
+            }
+
             const data = await res.json();
             lMsg.remove();
 

@@ -5,7 +5,11 @@
  */
 
 window.AiCopilotManager = (function () {
-    const API_BASE = '/api/ai';
+    const getApiUrl = () => {
+        if (window.API_BASE && window.API_BASE.startsWith('http')) return `${window.API_BASE}/ai/chat`;
+        if (window.location.port !== '5100') return 'http://localhost:5100/api/ai/chat';
+        return '/api/ai/chat';
+    };
     let isOpen = false;
 
     function init() {
@@ -116,11 +120,17 @@ window.AiCopilotManager = (function () {
         const loadingId = appendLoading();
 
         try {
-            const res = await fetch(`${API_BASE}/chat`, {
+            const url = getApiUrl();
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, isAdmin: true })
             });
+
+            if (!res.ok) {
+                const textErr = await res.text();
+                throw new Error(`Server returned HTTP ${res.status}: ${textErr.substring(0, 80)}`);
+            }
 
             const data = await res.json();
             removeMessage(loadingId);

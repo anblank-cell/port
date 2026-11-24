@@ -16,6 +16,7 @@ namespace Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Route("api/ai")]
     public class AiAssistantController : ControllerBase
     {
         private readonly PortfolioDbContext _context;
@@ -90,8 +91,8 @@ namespace Backend.Controllers
                 return await HandleCreateBackup();
             }
 
-            // ── Intent 5: Generate UI Component ────────────────────────────────
-            if (lower.Contains("generate ui") || lower.Contains("design component") || lower.Contains("generate component") || lower.Contains("create card") || lower.Contains("create pricing"))
+            // ── Intent 5: Generate UI Component or Redesign ────────────────────
+            if (lower.Contains("generate ui") || lower.Contains("design component") || lower.Contains("generate component") || lower.Contains("create card") || lower.Contains("create pricing") || lower.Contains("design of the ui") || lower.Contains("design ui") || lower.Contains("change design") || lower.Contains("redesign") || lower.Contains("change the design"))
             {
                 return HandleGenerateUi(prompt);
             }
