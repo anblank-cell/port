@@ -11,6 +11,7 @@ window.AiCopilotManager = (function () {
         return '/api/ai/chat';
     };
     let isOpen = false;
+    let chatHistory = [];
 
     function init() {
         if (document.getElementById('ai-copilot-container')) return;
@@ -52,18 +53,18 @@ window.AiCopilotManager = (function () {
                 <div id="ai-copilot-messages" style="flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:14px; background:#0F0E0C;">
                     <!-- Welcome Message -->
                     <div style="background:#171512; border:1px solid rgba(233,107,2,0.2); border-radius:12px; padding:14px; color:#FAF9F6; font-size:13px; line-height:1.5;">
-                        <strong style="color:#E96B02; display:block; margin-bottom:4px;">Welcome to your AI Co-Pilot!</strong>
-                        I have full control over your portfolio system. I can generate projects, skills, services, WordPress Duplicator packages, or high-taste UI elements on the fly.
+                        <strong style="color:#E96B02; display:block; margin-bottom:4px;">👋 Hey there! Welcome to your AI Co-Pilot!</strong>
+                        I'm your chatty, full-stack site architect. I can converse naturally, brainstorm ideas, draft new projects, register skills, design high-taste <strong>#0F0E0C</strong> &amp; <strong>#E96B02</strong> UI elements, or run WordPress Duplicator backups. What are we building today? 🚀
                     </div>
                 </div>
 
                 <!-- Quick Action Chips -->
                 <div style="padding:8px 14px; background:#171512; border-top:1px solid rgba(233,107,2,0.15); display:flex; gap:6px; overflow-x:auto; white-space:nowrap; scrollbar-width:none;">
-                    <button class="ai-chip" data-msg="Add project: NextGen DeFi Trading Platform" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">+ Project</button>
-                    <button class="ai-chip" data-msg="Add skill: Docker & Kubernetes" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">+ Skill</button>
-                    <button class="ai-chip" data-msg="Add service: Cloud Solutions Architecture" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">+ Service</button>
-                    <button class="ai-chip" data-msg="Create backup package" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">Backup Site</button>
-                    <button class="ai-chip" data-msg="Generate UI component for hero showcase" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">Design UI</button>
+                    <button class="ai-chip" data-msg="Hey! What can you help me build today?" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">👋 Say Hello</button>
+                    <button class="ai-chip" data-msg="Add project: Autonomous Multi-Agent AI Platform" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">🚀 + Project</button>
+                    <button class="ai-chip" data-msg="Design UI component for featured project showcase" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">🎨 Design UI</button>
+                    <button class="ai-chip" data-msg="What are my currently registered skills?" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">⚡ My Skills</button>
+                    <button class="ai-chip" data-msg="Create a WordPress Duplicator backup snapshot" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer;">📦 Backup Site</button>
                 </div>
 
                 <!-- Input Footer -->
@@ -134,13 +135,14 @@ window.AiCopilotManager = (function () {
         }
     }
 
-    async function sendMessage() {
+    async function sendMessage(customText) {
         const input = document.getElementById('ai-copilot-input');
-        const text = input.value.trim();
+        const text = customText || input.value.trim();
         if (!text) return;
 
-        input.value = '';
+        if (!customText) input.value = '';
         appendMessage('user', text);
+        chatHistory.push({ role: 'user', content: text });
 
         const loadingId = appendLoading();
 
@@ -149,7 +151,7 @@ window.AiCopilotManager = (function () {
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, isAdmin: true })
+                body: JSON.stringify({ message: text, isAdmin: true, history: chatHistory })
             });
 
             if (!res.ok) {
@@ -157,11 +159,25 @@ window.AiCopilotManager = (function () {
                 throw new Error(`Server returned HTTP ${res.status}: ${textErr.substring(0, 80)}`);
             }
 
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                throw new Error(`Endpoint returned non-JSON data. Please check that the ASP.NET Core backend is running at http://localhost:5100.`);
+            }
+
             const data = await res.json();
             removeMessage(loadingId);
 
             if (data && data.success && data.data) {
-                appendMessage('ai', data.data.reply, data.data.generatedHtml, data.data.actionExecuted, data.data.providerUsed, data.data.modelUsed);
+                chatHistory.push({ role: 'assistant', content: data.data.reply });
+                appendMessage(
+                    'ai',
+                    data.data.reply,
+                    data.data.generatedHtml,
+                    data.data.actionExecuted,
+                    data.data.providerUsed,
+                    data.data.modelUsed,
+                    data.data.suggestedFollowUps
+                );
             } else {
                 appendMessage('ai', data?.message || 'Sorry, I encountered an error executing that request.');
             }
@@ -171,20 +187,31 @@ window.AiCopilotManager = (function () {
         }
     }
 
-    function appendMessage(sender, text, htmlPreview, action, provider, model) {
+    function formatMarkdown(text) {
+        if (!text) return '';
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#FAF9F6;">$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.3); color:#E96B02; padding:2px 5px; border-radius:4px; font-size:12px;">$1</code>')
+            .replace(/\n\n/g, '<br><br>')
+            .replace(/\n- /g, '<br>&bull; ')
+            .replace(/\n/g, '<br>');
+    }
+
+    function appendMessage(sender, text, htmlPreview, action, provider, model, followUps) {
         const container = document.getElementById('ai-copilot-messages');
         const msg = document.createElement('div');
         msg.style.cssText = sender === 'user'
-            ? 'align-self:flex-end; background:#E96B02; color:#0F0E0C; font-weight:600; padding:10px 14px; border-radius:12px 12px 2px 12px; max-width:85%; font-size:13px; line-height:1.4;'
-            : 'align-self:flex-start; background:#171512; border:1px solid rgba(233,107,2,0.25); color:#FAF9F6; padding:12px 14px; border-radius:12px 12px 12px 2px; max-width:90%; font-size:13px; line-height:1.5;';
+            ? 'align-self:flex-end; background:#E96B02; color:#0F0E0C; font-weight:600; padding:10px 14px; border-radius:12px 12px 2px 12px; max-width:85%; font-size:13px; line-height:1.4; box-shadow:0 4px 14px rgba(233,107,2,0.3);'
+            : 'align-self:flex-start; background:#171512; border:1px solid rgba(233,107,2,0.25); color:#FAF9F6; padding:12px 14px; border-radius:12px 12px 12px 2px; max-width:90%; font-size:13px; line-height:1.5; box-shadow:0 4px 16px rgba(0,0,0,0.4);';
 
-        let inner = `<div>${text}</div>`;
+        let inner = `<div>${formatMarkdown(text)}</div>`;
 
         if (provider) {
             inner += `
-                <div style="margin-top:6px; font-size:10px; color:#A8A29E; display:flex; align-items:center; gap:6px;">
+                <div style="margin-top:8px; font-size:10px; color:#A8A29E; display:flex; align-items:center; gap:6px;">
                     <i class="fa-solid fa-microchip" style="color:#E96B02;"></i>
-                    <span>Provider: <strong>${provider}</strong> ${model ? `(${model})` : ''}</span>
+                    <span>Engine: <strong>${provider}</strong> ${model ? `(${model})` : ''}</span>
                 </div>
             `;
         }
@@ -209,7 +236,22 @@ window.AiCopilotManager = (function () {
             `;
         }
 
+        if (followUps && followUps.length > 0) {
+            inner += `<div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px; border-top:1px solid rgba(233,107,2,0.15); padding-top:8px;">`;
+            followUps.forEach(f => {
+                const escaped = f.replace(/"/g, '&quot;');
+                inner += `<button class="ai-followup-pill" data-prompt="${escaped}" style="background:#0F0E0C; border:1px solid rgba(233,107,2,0.35); color:#E96B02; padding:4px 9px; border-radius:10px; font-size:11px; font-weight:600; cursor:pointer; transition:0.15s;" onmouseover="this.style.background='rgba(233,107,2,0.15)'" onmouseout="this.style.background='#0F0E0C'">${f}</button>`;
+            });
+            inner += `</div>`;
+        }
+
         msg.innerHTML = inner;
+
+        // Wire follow-up pills
+        msg.querySelectorAll('.ai-followup-pill').forEach(btn => {
+            btn.onclick = () => sendMessage(btn.dataset.prompt);
+        });
+
         container.appendChild(msg);
         container.scrollTop = container.scrollHeight;
     }
@@ -220,7 +262,7 @@ window.AiCopilotManager = (function () {
         const div = document.createElement('div');
         div.id = id;
         div.style.cssText = 'align-self:flex-start; background:#171512; border:1px solid rgba(233,107,2,0.15); color:#E96B02; padding:10px 14px; border-radius:12px; font-size:12px; display:flex; align-items:center; gap:8px;';
-        div.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Analyzing intent and synthesizing action...`;
+        div.innerHTML = `<i class="fa-solid fa-sparkles fa-spin"></i> <span>Thinking &amp; composing response...</span>`;
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;
         return id;

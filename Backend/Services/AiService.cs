@@ -94,7 +94,7 @@ namespace Backend.Services
             return list;
         }
 
-        public async Task<AiCompletionResult> GenerateChatCompletionAsync(string userMessage, string systemPrompt)
+        public async Task<AiCompletionResult> GenerateChatCompletionAsync(string userMessage, string systemPrompt, List<ChatMessage>? history = null)
         {
             var provider = _settings.Provider?.Trim();
 
@@ -103,7 +103,7 @@ namespace Backend.Services
             if (string.Equals(provider, "Auto", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(provider, "Ollama", StringComparison.OrdinalIgnoreCase))
             {
-                var ollamaRes = await TryOllamaAsync(userMessage, systemPrompt);
+                var ollamaRes = await TryOllamaAsync(userMessage, systemPrompt, history);
                 if (ollamaRes != null) return ollamaRes;
             }
 
@@ -112,7 +112,7 @@ namespace Backend.Services
                  string.Equals(provider, "OpenRouter", StringComparison.OrdinalIgnoreCase)) &&
                 !string.IsNullOrWhiteSpace(_settings.OpenRouterApiKey))
             {
-                var openRouterRes = await TryOpenRouterAsync(userMessage, systemPrompt);
+                var openRouterRes = await TryOpenRouterAsync(userMessage, systemPrompt, history);
                 if (openRouterRes != null) return openRouterRes;
             }
 
@@ -121,7 +121,7 @@ namespace Backend.Services
                  string.Equals(provider, "Gemini", StringComparison.OrdinalIgnoreCase)) &&
                 !string.IsNullOrWhiteSpace(_settings.GeminiApiKey))
             {
-                var geminiRes = await TryGeminiAsync(userMessage, systemPrompt);
+                var geminiRes = await TryGeminiAsync(userMessage, systemPrompt, history);
                 if (geminiRes != null) return geminiRes;
             }
 
@@ -130,7 +130,7 @@ namespace Backend.Services
                  string.Equals(provider, "Groq", StringComparison.OrdinalIgnoreCase)) &&
                 !string.IsNullOrWhiteSpace(_settings.GroqApiKey))
             {
-                var groqRes = await TryGroqAsync(userMessage, systemPrompt);
+                var groqRes = await TryGroqAsync(userMessage, systemPrompt, history);
                 if (groqRes != null) return groqRes;
             }
 
@@ -143,7 +143,27 @@ namespace Backend.Services
             );
         }
 
-        private async Task<AiCompletionResult?> TryOllamaAsync(string userMessage, string systemPrompt)
+        private List<object> BuildOpenAiMessages(string systemPrompt, string userMessage, List<ChatMessage>? history)
+        {
+            var messages = new List<object>
+            {
+                new { role = "system", content = systemPrompt }
+            };
+
+            if (history != null && history.Count > 0)
+            {
+                foreach (var msg in history.TakeLast(8))
+                {
+                    var role = string.Equals(msg.Role, "user", StringComparison.OrdinalIgnoreCase) ? "user" : "assistant";
+                    messages.Add(new { role, content = msg.Content });
+                }
+            }
+
+            messages.Add(new { role = "user", content = userMessage });
+            return messages;
+        }
+
+        private async Task<AiCompletionResult?> TryOllamaAsync(string userMessage, string systemPrompt, List<ChatMessage>? history)
         {
             try
             {
@@ -151,11 +171,7 @@ namespace Backend.Services
                 var payload = new
                 {
                     model = _settings.OllamaModel,
-                    messages = new[]
-                    {
-                        new { role = "system", content = systemPrompt },
-                        new { role = "user", content = userMessage }
-                    },
+                    messages = BuildOpenAiMessages(systemPrompt, userMessage, history),
                     stream = false
                 };
 
@@ -185,7 +201,7 @@ namespace Backend.Services
             return null;
         }
 
-        private async Task<AiCompletionResult?> TryOpenRouterAsync(string userMessage, string systemPrompt)
+        private async Task<AiCompletionResult?> TryOpenRouterAsync(string userMessage, string systemPrompt, List<ChatMessage>? history)
         {
             try
             {
@@ -198,11 +214,7 @@ namespace Backend.Services
                 var payload = new
                 {
                     model = _settings.OpenRouterModel,
-                    messages = new[]
-                    {
-                        new { role = "system", content = systemPrompt },
-                        new { role = "user", content = userMessage }
-                    }
+                    messages = BuildOpenAiMessages(systemPrompt, userMessage, history)
                 };
 
                 req.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
@@ -231,12 +243,24 @@ namespace Backend.Services
             return null;
         }
 
-        private async Task<AiCompletionResult?> TryGeminiAsync(string userMessage, string systemPrompt)
+        private async Task<AiCompletionResult?> TryGeminiAsync(string userMessage, string systemPrompt, List<ChatMessage>? history)
         {
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
                 var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_settings.GeminiModel}:generateContent?key={_settings.GeminiApiKey}";
+
+                var sb = new StringBuilder();
+                sb.AppendLine(systemPrompt);
+                if (history != null && history.Count > 0)
+                {
+                    sb.AppendLine("\n--- Recent Conversation ---");
+                    foreach (var msg in history.TakeLast(6))
+                    {
+                        sb.AppendLine($"{msg.Role}: {msg.Content}");
+                    }
+                }
+                sb.AppendLine($"\nUser prompt: {userMessage}");
 
                 var payload = new
                 {
@@ -247,7 +271,7 @@ namespace Backend.Services
                             role = "user",
                             parts = new[]
                             {
-                                new { text = $"{systemPrompt}\n\nUser request: {userMessage}" }
+                                new { text = sb.ToString() }
                             }
                         }
                     }
@@ -280,7 +304,7 @@ namespace Backend.Services
             return null;
         }
 
-        private async Task<AiCompletionResult?> TryGroqAsync(string userMessage, string systemPrompt)
+        private async Task<AiCompletionResult?> TryGroqAsync(string userMessage, string systemPrompt, List<ChatMessage>? history)
         {
             try
             {
@@ -291,11 +315,7 @@ namespace Backend.Services
                 var payload = new
                 {
                     model = _settings.GroqModel,
-                    messages = new[]
-                    {
-                        new { role = "system", content = systemPrompt },
-                        new { role = "user", content = userMessage }
-                    }
+                    messages = BuildOpenAiMessages(systemPrompt, userMessage, history)
                 };
 
                 req.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");

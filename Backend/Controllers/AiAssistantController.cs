@@ -29,7 +29,7 @@ namespace Backend.Controllers
             _aiService = aiService;
         }
 
-        public record AiChatRequest(string Message, string? Context, bool? IsAdmin);
+        public record AiChatRequest(string Message, string? Context, bool? IsAdmin, List<ChatMessage>? History);
 
         public record AiActionExecuted(string ActionType, string TargetTitle, object? Details);
 
@@ -129,8 +129,8 @@ namespace Backend.Controllers
                 return HandleGenerateUi(prompt);
             }
 
-            // ── Intent 6: Query / Profile Knowledge Base ──────────────────────
-            return await HandleKnowledgeQuery(prompt);
+            // ── Intent 6: Query / Profile Knowledge Base & Conversational Chat ───
+            return await HandleKnowledgeQuery(prompt, request.History);
         }
 
         private async Task<ActionResult<ApiResponse<AiChatResponse>>> HandleCreateProject(string prompt)
@@ -315,7 +315,7 @@ namespace Backend.Controllers
             return Ok(ApiResponse<AiChatResponse>.SuccessResponse(res));
         }
 
-        private async Task<ActionResult<ApiResponse<AiChatResponse>>> HandleKnowledgeQuery(string prompt)
+        private async Task<ActionResult<ApiResponse<AiChatResponse>>> HandleKnowledgeQuery(string prompt, List<ChatMessage>? history)
         {
             var projects = await _context.Projects.AsNoTracking().Take(6).ToListAsync();
             var skills = await _context.Skills.AsNoTracking().Take(10).ToListAsync();
@@ -326,9 +326,23 @@ namespace Backend.Controllers
             var serviceList = string.Join(", ", services.Select(s => s.Name));
 
             // 1. Attempt LLM generation via Ollama (Local Unlimited), OpenRouter Free, Gemini, or Groq
-            var systemPrompt = $"You are the AI Site Architect for an enterprise portfolio platform built with ASP.NET Core and modern frontend architecture. The design system uses #0F0E0C as primary dark background and #E96B02 as primary warm accent. Current portfolio database:\n- Projects: {projectList}\n- Skills: {skillList}\n- Services: {serviceList}\nAnswer clearly and accurately. Highlight your capability to create projects, add skills, or export WordPress Duplicator snapshots.";
+            var systemPrompt = $@"You are the friendly, witty, and highly capable AI Site Architect & Co-Pilot for this portfolio platform. You converse naturally, chat playfully when greeted, and give thoughtful, deep architectural answers when asked technical questions—just like ChatGPT or an experienced engineering lead!
 
-            var aiResult = await _aiService.GenerateChatCompletionAsync(prompt, systemPrompt);
+Key Personality Traits:
+- Talkative, helpful, and engaging.
+- Use natural emojis (🚀, ✨, 💡, 🛠️, 🎯, 🔥) and formatted markdown (bullet points, bold text).
+- Feel free to share ideas, brainstorm project concepts, explain architecture decisions, or tell engineering jokes when appropriate.
+- You have direct execution capabilities to create projects, add skills, design UI cards, and create WordPress Duplicator backups.
+- Site theme: #0F0E0C (luxurious deep canvas) and #E96B02 (warm energetic accent).
+
+Current Portfolio Database Context:
+- Projects: {projectList}
+- Skills: {skillList}
+- Services: {serviceList}
+
+Always maintain an encouraging, collaborative conversational tone!";
+
+            var aiResult = await _aiService.GenerateChatCompletionAsync(prompt, systemPrompt, history);
             if (!string.IsNullOrWhiteSpace(aiResult.Text))
             {
                 var llmRes = new AiChatResponse(
@@ -342,25 +356,53 @@ namespace Backend.Controllers
                 return Ok(ApiResponse<AiChatResponse>.SuccessResponse(llmRes));
             }
 
-            // 2. Built-in Local Autonomous Engine Fallback
+            // 2. Built-in Conversational Fallback Engine (Rich, Friendly & Chatty)
             string reply;
-            var lower = prompt.ToLowerInvariant();
+            var lower = prompt.ToLowerInvariant().Trim();
 
-            if (lower.Contains("skill"))
+            // Greetings & Casual check-ins
+            if (lower is "hi" or "hello" or "hey" or "howdy" or "sup" or "yo" or "good morning" or "good evening")
             {
-                reply = $"The platform features proficiency in key technical skills including: **{skillList}**. Each skill includes category grouping and rating indicators.";
+                reply = "Hey there! 👋 Fantastic to see you! I'm your AI Site Architect co-pilot. I'm ready to help you brainstorm new features, register projects, tweak your portfolio's **#E96B02** styling, or just chat about system design. What's on your mind today? 🚀";
             }
-            else if (lower.Contains("project"))
+            else if (lower.Contains("how are you") || lower.Contains("how're you") || lower.Contains("how r u"))
             {
-                reply = $"Currently highlighted projects include: **{projectList}**. These demonstrate full-stack architecture, API integration, and modern design principles.";
+                reply = "I'm doing stellar, thanks for asking! ⚡ Running smoothly on your local ASP.NET Core engine with 100% uptime and zero latency. All your database tables are loaded and ready. How's your coding session going today? 💡";
             }
-            else if (lower.Contains("service"))
+            else if (lower.Contains("who are you") || lower.Contains("what are you") || lower.Contains("tell me about yourself"))
             {
-                reply = $"Available professional services include: **{serviceList}**.";
+                reply = "Think of me as your personal **ChatGPT + System Architect** built right into your portfolio CMS! 🛠️✨\n\nI can:\n- 🚀 **Brainstorm & Create Projects** in your database with single-click ease\n- ⚡ **Roster Skills & Services** with real-time categorizations\n- 📦 **Generate WordPress Duplicator Snapshots** to backup or migrate your entire site\n- 🎨 **Design High-Taste UI Components** matching your signature **#0F0E0C** & **#E96B02** palette\n\nWhat would you like to build or automate right now?";
+            }
+            else if (lower.Contains("joke") || lower.Contains("funny") || lower.Contains("laugh"))
+            {
+                var jokes = new[]
+                {
+                    "Why do programmers prefer dark mode (**#0F0E0C**)? Because light attracts bugs! 🐛😄",
+                    "There are only 10 types of people in the world: those who understand binary, and those who don't! 💻",
+                    "A SQL query walks into a bar, walks up to two tables and asks: *'Can I join you?'* 🍻😂"
+                };
+                var randomJoke = jokes[new Random().Next(jokes.Length)];
+                reply = $"{randomJoke}\n\nGot any other burning questions or projects we should tackle today? 🚀";
+            }
+            else if (lower.Contains("skill") || lower.Contains("tech stack") || lower.Contains("technologies"))
+            {
+                reply = $"Here's the technical stack powering this platform right now:\n\n⚡ **{skillList}**\n\nWe've got a rock-solid mix of backend architecture, database modeling, and snappy frontend performance! Would you like me to register a new skill or add proficiency ratings to any category? 🎯";
+            }
+            else if (lower.Contains("project") || lower.Contains("portfolio") || lower.Contains("work"))
+            {
+                reply = $"Currently, the portfolio is showcasing these featured projects:\n\n🌟 **{projectList}**\n\nEach project demonstrates clean architecture, responsive layouts, and modern API communication. Would you like me to help you draft a new project idea or generate a case study? ✨";
+            }
+            else if (lower.Contains("service") || lower.Contains("offer") || lower.Contains("pricing"))
+            {
+                reply = $"Here are the primary engineering capabilities currently offered:\n\n💼 **{serviceList}**\n\nFrom end-to-end full stack development to cloud architecture and API integrations. Want to add a new service or adjust the descriptions? 🛠️";
+            }
+            else if (lower.Contains("thank") || lower.Contains("thanks") || lower.Contains("awesome") || lower.Contains("cool") || lower.Contains("great"))
+            {
+                reply = "You're very welcome! 🙌 It's a pleasure collaborating with you. Whenever you want to add content, test a new UI component, or create a site backup, just give me the word! 🚀✨";
             }
             else
             {
-                reply = $"Hello! I am your **AI Site Architect & Assistant** powered by a unified multi-provider engine (Ollama Local Unlimited, OpenRouter Free, Gemini Free Tier, and Built-in Autonomous Engine). What would you like to build or automate?";
+                reply = $"That's a great thought! 💡 As your portfolio co-pilot, I'm here to help you brainstorm ideas, refine your site's content, draft new project showcases, or create full backup snapshots with our **#0F0E0C** & **#E96B02** styling.\n\nTell me a bit more about what you have in mind—should we generate a new project, design a UI card, or explore a specific concept together? 🛠️";
             }
 
             var res = new AiChatResponse(

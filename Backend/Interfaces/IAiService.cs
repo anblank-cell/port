@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 
 namespace Backend.Interfaces
 {
+    public record ChatMessage(string Role, string Content);
+
     public record AiCompletionResult(
         string Text,
         string ProviderUsed,
@@ -21,7 +23,7 @@ namespace Backend.Interfaces
 
     public interface IAiService
     {
-        Task<AiCompletionResult> GenerateChatCompletionAsync(string userMessage, string systemPrompt);
+        Task<AiCompletionResult> GenerateChatCompletionAsync(string userMessage, string systemPrompt, List<ChatMessage>? history = null);
         Task<List<AiProviderInfo>> GetAvailableProvidersAsync();
         string GetActiveProviderName();
     }
