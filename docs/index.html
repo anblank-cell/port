@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio CMS - Documentation</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-book-open" style="color: var(--accent)"></i> Portfolio <span>Docs</span>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Introduction</div>
+            <ul class="nav-links">
+                <li><a href="#overview" class="active">Project Overview</a></li>
+                <li><a href="#features">Key Features</a></li>
+                <li><a href="#architecture">Architecture & Stack</a></li>
+            </ul>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Development Guide</div>
+            <ul class="nav-links">
+                <li><a href="#add-functionality">How to Add a Feature</a></li>
+                <li><a href="#db-migrations">Database & Migrations</a></li>
+                <li><a href="#admin-panel">Extending Admin Panel</a></li>
+                <li><a href="#plugins-arch">Plugins Architecture</a></li>
+            </ul>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Standards</div>
+            <ul class="nav-links">
+                <li><a href="#coding-rules">Coding Standards</a></li>
+                <li><a href="#security">Security & Auth</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- OVERVIEW -->
+        <section id="overview">
+            <h1>Project Overview</h1>
+            <p>Welcome to the <strong>Portfolio CMS</strong> documentation. This project is a scalable, production-grade Full Stack Portfolio Management Platform engineered with enterprise software standards. </p>
+            <p>The system is strictly decoupled: the frontend consumes data exclusively through REST APIs, and the backend handles complex business logic, database management, and security, ensuring complete separation of concerns.</p>
+            
+            <div class="alert alert-info">
+                <i class="fa-solid fa-circle-info" style="font-size: 1.25rem;"></i>
+                <div>
+                    <strong>Core Philosophy:</strong> Everything visible on the portfolio website is dynamically manageable from the Admin Dashboard. There are no hardcoded data values.
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <h4>Dynamic Content Management</h4>
+                    <p>Fully manageable sections including Projects, Services, Skills, Experience, Education, and Testimonials via the Admin Panel.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h4>Secure Authentication</h4>
+                    <p>JWT-based authentication with refresh tokens, password hashing via BCrypt, and secure role-based authorization.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-photo-film"></i>
+                    <h4>Media Library</h4>
+                    <p>Centralized media and file organizer for uploading, managing, and picking assets for different content sections.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <h4>Premium UI/UX</h4>
+                    <p>Designed with glassmorphism, smooth animations (GSAP, Lenis), and modern typography inspired by Linear and Vercel.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE -->
+        <section id="architecture">
+            <h2>Architecture & Stack</h2>
+            <p>The platform follows <strong>Clean Architecture</strong> and <strong>SOLID principles</strong>.</p>
+            
+            <h3>Backend Stack (.NET 8)</h3>
+            <ul>
+                <li><strong>Framework:</strong> ASP.NET Core 8 Web API</li>
+                <li><strong>Database:</strong> PostgreSQL (via Entity Framework Core Code-First)</li>
+                <li><strong>Patterns:</strong> Repository Pattern, Service Layer, Dependency Injection</li>
+                <li><strong>Utilities:</strong> AutoMapper for DTOs, FluentValidation for robust model validation</li>
+            </ul>
+
+            <h3>Frontend Stack (Vanilla HTML/CSS/JS)</h3>
+            <ul>
+                <li><strong>Structure:</strong> Semantic HTML5, CSS3 with CSS Variables</li>
+                <li><strong>Logic:</strong> Modular ES6 JavaScript (No heavyweight frameworks)</li>
+                <li><strong>Libraries:</strong> FontAwesome, GSAP for animations</li>
+            </ul>
+        </section>
+
+        <!-- ADD FUNCTIONALITY -->
+        <section id="add-functionality">
+            <h2>How to Add a New Functionality</h2>
+            <p>To introduce a new feature (e.g., a "Blog" module), you must implement it vertically across the stack. Follow this standard enterprise workflow.</p>
+            
+            <div class="workflow-container">
+                <div class="workflow-step">
+                    <h4>1. Database Entity</h4>
+                    <p>Create the data model in <code>Backend/Entities/</code>. All models must use UUIDs for primary keys and include audit fields.</p>
+<pre><code>public class BlogPost : BaseEntity 
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+}</code></pre>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>2. DTOs & Validation</h4>
+                    <p>Create Data Transfer Objects in <code>Backend/DTOs/</code> to separate database models from API contracts. Add a validator in <code>Backend/Validators/</code>.</p>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>3. Repository & Service</h4>
+                    <p>Implement the data access in <code>Backend/Repositories/</code> and business logic in <code>Backend/Services/</code>. Register them in Dependency Injection (<code>Program.cs</code>).</p>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>4. Database Migration</h4>
+                    <p>Add a <code>DbSet</code> to the `ApplicationDbContext`, configure relationships, and run Entity Framework migrations.</p>
+<pre><code>dotnet ef migrations add AddBlogTable
+dotnet ef database update</code></pre>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>5. REST API Controller</h4>
+                    <p>Expose endpoints in <code>Backend/Controllers/</code>. Ensure you use standard HTTP methods and proper route attributes.</p>
+                </div>
+
+                <div class="workflow-step">
+                    <h4>6. Frontend Component</h4>
+                    <p>In <code>Frontend/admin/components/</code>, create a JavaScript module (e.g., <code>blog-manager.js</code>) that calls your new API via <code>utils/api.js</code> and renders the table/forms in the UI.</p>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.25rem;"></i>
+                <div>
+                    <strong>Strict Rule:</strong> Never bypass the API. The frontend must never contain business logic, and the backend must never output HTML.
+                </div>
+            </div>
+        </section>
+
+        <!-- DB MIGRATIONS -->
+        <section id="db-migrations">
+            <h2>Database & Migrations</h2>
+            <p>We use <strong>Code-First Migrations</strong>. Never modify the PostgreSQL database manually. Every schema change must be tracked via EF Core.</p>
+            
+            <h3>Common Commands</h3>
+            <pre><code># Create a new migration after changing an Entity
+dotnet ef migrations add &lt;DescriptiveName&gt;
+
+# Apply pending migrations to the database
+dotnet ef database update
+
+# Revert the last migration (if not yet pushed)
+dotnet ef migrations remove</code></pre>
+        </section>
+        
+        <!-- ADMIN PANEL EXTENSION -->
+        <section id="admin-panel">
+            <h2>Extending the Admin Panel</h2>
+            <p>The Admin Dashboard is built dynamically. To add a new page (e.g., Plugins):</p>
+            <ol>
+                <li>Create a script in <code>Frontend/admin/components/new-manager.js</code> following the IIFE module pattern (like <code>window.NewManager = (() => {...})();</code>).</li>
+                <li>Add a sidebar link in <code>Frontend/admin/pages/dashboard.html</code> with a unique <code>data-panel="newfeature"</code> attribute.</li>
+                <li>Add a container <code>&lt;section class="panel" id="panel-newfeature"&gt;</code> in <code>dashboard.html</code>.</li>
+                <li>In the <code>loadPanel</code> switch statement within the dashboard logic, initialize your manager when the user clicks the link.</li>
+            </ol>
+        </section>
+
+        <!-- PLUGINS ARCHITECTURE -->
+        <section id="plugins-arch">
+            <h2>Plugins Architecture</h2>
+            <p>The platform supports a WordPress-style plugin marketplace. Plugins are stored centrally and installed dynamically to the frontend.</p>
+            
+            <h3>Plugin Repository</h3>
+            <p>All available plugins are stored as separate folders inside <code>docs/plugins/</code>. Each folder contains the frontend components and a <code>plugin.json</code> metadata file defining the plugin's ID, Name, Description, Version, and Files list.</p>
+            
+            <h3>Backend Control (<code>PluginsController.cs</code>)</h3>
+            <p>The <code>PluginsController</code> is responsible for safely moving files on the disk to simulate an installation process. It provides:</p>
+            <ul>
+                <li><strong>GET <code>/api/plugins/available</code></strong>: Scans <code>docs/plugins</code>, parses <code>plugin.json</code> files, and cross-references with <code>Frontend/admin/components/</code> to determine which plugins are currently installed vs available.</li>
+                <li><strong>POST <code>/api/plugins/install/{id}</code></strong>: Physically copies the declared files from the repository directory to the active frontend components directory.</li>
+                <li><strong>DELETE <code>/api/plugins/{id}</code></strong>: Physically erases the plugin files from the active frontend directory, completely uninstalling the code.</li>
+            </ul>
+            
+            <h3>Frontend (<code>plugins-manager.js</code>)</h3>
+            <p>The UI fetches the available plugins and renders a "Plugin Repository" view where admins can search for and install plugins. Installed plugins can be activated/deactivated (state stored in browser <code>localStorage</code>) or fully deleted.</p>
+        </section>
+
+        <!-- CODING RULES -->
+        <section id="coding-rules">
+            <h2>Coding Standards & Guidelines</h2>
+            <ul>
+                <li><strong>C# Conventions:</strong> Follow Microsoft .NET naming standards (PascalCase for classes/methods, camelCase for local variables).</li>
+                <li><strong>File Modification:</strong> Never overwrite or delete files blindly. Always preserve backward compatibility.</li>
+                <li><strong>API Responses:</strong> Use standardized JSON wrappers for all API responses ensuring frontend clients can parse errors consistently.</li>
+                <li><strong>DRY & KISS:</strong> Avoid duplicating logic. Keep components isolated and simple.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <script>
+        // Smooth scrolling & active state tracking
+        const links = document.querySelectorAll('.nav-links a');
+        const sections = document.querySelectorAll('section');
+
+        // Click handler
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetEl = document.getElementById(targetId);
+                window.scrollTo({
+                    top: targetEl.offsetTop - 40,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Scroll spy
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(sec => {
+                const secTop = sec.offsetTop;
+                if (scrollY >= secTop - 100) {
+                    current = sec.getAttribute('id');
+                }
+            });
+
+            links.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+        <!-- CLASSES REPORT -->
+        <section id='classes-report'>
+            <h2>Classes Report</h2>
+            <p>Detailed report of the core classes used in this project's backend architecture.</p>
+            <ul>
+                <li><strong>BaseEntity</strong>: The foundational class for all database entities, providing common properties like Id (UUID), audit tracking (CreatedAt, CreatedBy, UpdatedAt, UpdatedBy), and soft-delete capabilities (IsDeleted, DeletedAt, DeletedBy).</li>
+                <li><strong>Page</strong>: Inherits from BaseEntity. Represents a custom page in the CMS. Stores properties such as Title, Slug, HtmlContent, CssContent, and Status.</li>
+                <li><strong>PluginDto</strong>: A Data Transfer Object used to map and transfer plugin metadata (Id, Name, Version, Description, Icon, IsInstalled) between the server and the frontend.</li>
+                <li><strong>ApiResponse&lt;T&gt;</strong>: A generic wrapper class used to standardize all HTTP responses. It includes properties for success status, a descriptive message, and the generic data payload.</li>
+                <li><strong>PortfolioDbContext</strong>: The Entity Framework Core database context class responsible for managing database connections and providing DbSets for all entities (like Pages, Projects, Skills, etc.).</li>
+                <li><strong>PagesController</strong>: An ASP.NET Core API Controller that handles HTTP requests for custom pages, implementing standard CRUD operations and ensuring proper RESTful routing and authorization.</li>
+            </ul>
+        </section>
+

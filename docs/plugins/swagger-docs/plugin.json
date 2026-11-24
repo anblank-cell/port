@@ -1,0 +1,10 @@
+{
+  "id": "swaggerdocs",
+  "name": "API Docs (Swagger)",
+  "version": "1.0.0",
+  "description": "View and interact with the backend REST API directly from the admin dashboard using Swagger UI.",
+  "icon": "fa-solid fa-code",
+  "files": [
+    "swagger-docs.js"
+  ]
+}

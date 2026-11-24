@@ -1,0 +1,10 @@
+{
+  "id": "fileorganizer",
+  "name": "File Manager",
+  "version": "1.0.0",
+  "description": "Advanced file explorer to manage frontend code directly from the dashboard.",
+  "icon": "fa-solid fa-folder-tree",
+  "files": [
+    "file-organizer.js"
+  ]
+}

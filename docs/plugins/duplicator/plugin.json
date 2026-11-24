@@ -1,0 +1,10 @@
+{
+  "id": "duplicator",
+  "name": "WordPress Duplicator",
+  "version": "1.0.0",
+  "description": "Full site duplicator, cloner, backup manager, and WordPress importer.",
+  "icon": "fa-solid fa-clone",
+  "files": [
+    "duplicator.js"
+  ]
+}
