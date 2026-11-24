@@ -1,0 +1,84 @@
+/* Premium CSS Variables and Design System Tokens */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Color Palette - Custom Primary: #0F0E0C, Accent: #E96B02 */
+    --bg-primary: #0F0E0C;                    /* Primary background (#0F0E0C) */
+    --bg-secondary: #171512;                  /* Secondary surface layer */
+    --bg-card: rgba(23, 21, 18, 0.75);        /* Sleek glassmorphic card fill */
+    --bg-card-hover: rgba(35, 31, 26, 0.85);   /* Accent card hover highlight */
+    --bg-topbar: rgba(15, 14, 12, 0.85);      /* Topbar background */
+    --bg-table-head: rgba(23, 21, 18, 0.9);   /* Table header background */
+    --bg-input: rgba(23, 21, 18, 0.9);        /* Form input background */
+    --bg-modal-overlay: rgba(15, 14, 12, 0.8);/* Modal backdrop overlay */
+    --bg-navbar: rgba(15, 14, 12, 0.75);      /* Glassmorphic navbar fill */
+    
+    --border-color: rgba(233, 107, 2, 0.15);  /* Subtle warm border */
+    --border-color-hover: rgba(233, 107, 2, 0.4); /* Interactive hover highlight */
+
+    /* Typography Text Colors */
+    --text-primary: #FAF9F6;                  /* Main header and highlight text */
+    --text-secondary: #A8A29E;                /* Descriptive paragraph body text */
+    --text-muted: #78716C;                    /* Captions, index titles, disabled labels */
+    
+    /* Branding Accent & Gradient Colors */
+    --accent: #E96B02;                        /* Primary Accent: #E96B02 */
+    --accent-glow: rgba(233, 107, 2, 0.2);     /* Accent warm glow */
+    --accent-gradient: linear-gradient(135deg, #E96B02, #FF8A24); /* Warm gradient */
+    --text-gradient: linear-gradient(to right, #FFFFFF 40%, #D6D3D1 100%);
+
+    /* Layout Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 4rem;
+    --spacing-xl: 8rem;
+
+    /* Borders & Rounding */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+
+    /* Transitions & Animations */
+    --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.3);
+    --shadow-premium: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+
+    /* Fonts */
+    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* World-Class Light Mode Theme Tokens */
+[data-theme="light"] {
+    --bg-primary: hsl(220, 20%, 97%);         /* Slate 50: Crisp, clean light canvas (#f8fafc) */
+    --bg-secondary: hsl(0, 0%, 100%);         /* Pure White: Structural containers & sidebar (#ffffff) */
+    --bg-card: hsl(0, 0%, 100%);             /* Crisp white card fill */
+    --bg-card-hover: hsl(210, 20%, 96%);      /* Subtle slate card hover fill */
+    --bg-topbar: rgba(255, 255, 255, 0.88);   /* Frosted white topbar */
+    --bg-table-head: hsl(220, 14%, 94%);     /* Crisp light slate table header */
+    --bg-input: hsl(0, 0%, 100%);             /* Crisp white input background */
+    --bg-modal-overlay: rgba(15, 23, 42, 0.45);/* Soft dark slate backdrop overlay */
+    --bg-navbar: rgba(255, 255, 255, 0.85);   /* Frosted white navbar fill */
+
+    --border-color: hsl(214, 32%, 91%);       /* Slate 200: Elegant border (#e2e8f0) */
+    --border-color-hover: hsl(215, 20%, 80%); /* Slate 300: Interactive hover border (#cbd5e1) */
+
+    --text-primary: hsl(222, 47%, 11%);       /* Slate 900: High-contrast primary text (#0f172a) */
+    --text-secondary: hsl(215, 16%, 35%);     /* Slate 600: Readable body text (#475569) */
+    --text-muted: hsl(215, 16%, 52%);         /* Slate 500: Subdued captions (#64748b) */
+
+    --accent: hsl(250, 84%, 54%);             /* Royal Indigo Accent (#5b21b6 / #6366f1) */
+    --accent-glow: rgba(99, 102, 241, 0.14);  /* Violet accent glow */
+    --accent-gradient: linear-gradient(135deg, hsl(252, 87%, 56%), hsl(217, 91%, 60%));
+    --text-gradient: linear-gradient(to right, hsl(222, 47%, 11%) 40%, hsl(250, 84%, 48%) 100%);
+
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+    --shadow-premium: 0 10px 30px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+}

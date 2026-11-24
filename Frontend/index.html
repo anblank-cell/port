@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Portfolio Management System</title>
+    <meta name="description" content="A premium, enterprise-grade Portfolio Management Platform showcasing projects, credentials, experiences, and professional services.">
+    <meta name="keywords" content="Portfolio, Software Engineer, Enterprise, Full Stack Developer, Admin Panel">
+    
+    <!-- Open Graph (SEO) -->
+    <meta property="og:title" content="Enterprise Portfolio Management System">
+    <meta property="og:description" content="A premium, enterprise-grade Portfolio Management Platform.">
+    <meta property="og:type" content="website">
+
+    <!-- Font Awesome Icons & CSS Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Restore Portfolio Theme Preferences -->
+    <script>
+        (() => {
+            const theme  = localStorage.getItem('portfolio_theme');
+            const bg     = localStorage.getItem('portfolio_bg');
+            const accent = localStorage.getItem('portfolio_accent');
+            if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+            if (bg) document.documentElement.style.setProperty('--bg-primary', bg);
+            if (accent) document.documentElement.style.setProperty('--accent', accent);
+        })();
+    </script>
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+
+    <!-- Inline Gradient Grid Background Shader (Premium Accent) -->
+    <style>
+        .radial-glow-canvas {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.08) 0%, transparent 45%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .hero-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Radial Glow Background -->
+    <div class="radial-glow-canvas"></div>
+
+    <!-- Glassmorphic Navbar -->
+    <nav class="navbar" id="main-navbar">
+        <div class="container navbar-container">
+            <a href="#" class="logo" id="logo-anchor">
+                <span>PORTFOLIO</span>
+                <span class="logo-dot"></span>
+            </a>
+            
+            <ul class="nav-links" id="navigation-menu">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="admin/pages/login.html" class="btn btn-secondary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;" id="login-button">Admin Login</a></li>
+            </ul>
+
+            <button class="burger-menu" id="burger-menu-toggle" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <main>
+        
+        <!-- Hero Section (data loaded from API) -->
+        <section class="hero-section" id="hero">
+            <div class="container hero-content">
+                <span class="badge" id="hero-badge">Available for Work</span>
+                <h1 class="hero-title text-glow-gradient" id="hero-heading">Crafting Exceptional Digital Experiences</h1>
+                <p class="hero-subtitle" id="hero-subtext">
+                    Full stack developer building production-grade applications with clean architecture, premium UX, and enterprise security.
+                </p>
+                <div class="hero-actions" id="hero-call-to-actions">
+                    <a href="#projects" class="btn btn-primary" id="view-work-cta">Explore Work</a>
+                    <a href="#contact" class="btn btn-secondary" id="contact-cta">Get In Touch</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section (live from API) -->
+        <section class="section" id="services" style="border-top: 1px solid var(--border-color);">
+            <div class="container">
+                <div class="section-header" style="text-align: center; margin-bottom: var(--spacing-lg);">
+                    <span class="badge">Capabilities</span>
+                    <h2>What I Offer</h2>
+                </div>
+                <div class="card-grid" id="services-grid">
+                    <div class="premium-card" style="opacity:0.4;text-align:center;padding:3rem;"><p>Loading services…</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section (live from API) -->
+        <section class="section" id="projects" style="border-top: 1px solid var(--border-color);">
+            <div class="container">
+                <div class="section-header" style="text-align: center; margin-bottom: var(--spacing-lg);">
+                    <span class="badge">Portfolio</span>
+                    <h2>Featured Projects</h2>
+                </div>
+                <div class="card-grid" id="projects-grid">
+                    <div class="premium-card" style="opacity:0.4;text-align:center;padding:3rem;"><p>Loading projects…</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section (live from API) -->
+        <section class="section" id="skills" style="border-top: 1px solid var(--border-color);">
+            <div class="container">
+                <div class="section-header" style="text-align: center; margin-bottom: var(--spacing-lg);">
+                    <span class="badge">Expertise</span>
+                    <h2>Skills &amp; Technologies</h2>
+                </div>
+                <div id="skills-container"></div>
+            </div>
+        </section>
+
+        <!-- Experience Section (live from API) -->
+        <section class="section" id="experience" style="border-top: 1px solid var(--border-color);">
+            <div class="container">
+                <div class="section-header" style="text-align: center; margin-bottom: var(--spacing-lg);">
+                    <span class="badge">Journey</span>
+                    <h2>Work Experience</h2>
+                </div>
+                <div id="experience-list"></div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="section" id="contact" style="border-top: 1px solid var(--border-color);">
+            <div class="container" style="max-width: 640px; margin: 0 auto;">
+                <div class="section-header" style="text-align: center; margin-bottom: var(--spacing-lg);">
+                    <span class="badge">Get In Touch</span>
+                    <h2>Contact Me</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.75rem;">Have a project in mind? Let's talk.</p>
+                </div>
+                <form id="contact-form" style="display:flex;flex-direction:column;gap:1rem;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <input type="text"  id="cf-name"    placeholder="Your Name"    required style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;">
+                        <input type="email" id="cf-email"   placeholder="Your Email"   required style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;">
+                    </div>
+                    <input type="text" id="cf-subject" placeholder="Subject" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;">
+                    <textarea id="cf-message" rows="5" placeholder="Your message…" required style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;resize:vertical;"></textarea>
+                    <button type="submit" class="btn btn-primary" id="cf-submit" style="align-self:flex-start;">Send Message</button>
+                    <div id="cf-status" style="display:none;padding:0.75rem 1rem;border-radius:8px;font-size:0.875rem;"></div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="main-footer">
+        <div class="container footer-container">
+            <div id="footer-copyright">
+                &copy; 2026 Portfolio Platform. All rights reserved.
+            </div>
+            <ul class="footer-links" id="footer-navigation">
+                <li><a href="#hero">Privacy Policy</a></li>
+                <li><a href="#hero">Terms of Service</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Core Animations & Scroll Libraries (Lenis + GSAP) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- API Service Layer -->
+    <script src="utils/api.js"></script>
+
+    <!-- Application Controller -->
+    <script src="assets/js/app.js"></script>
+
+    <!-- Portfolio Data Loader -->
+    <script src="assets/js/portfolio.js"></script>
+
+    <!-- Public Interactive AI Guide -->
+    <script src="assets/js/ai-public.js"></script>
+</body>
+</html>
